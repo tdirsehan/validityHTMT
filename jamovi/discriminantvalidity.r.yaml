@@ -27,13 +27,14 @@ items:
         title: HTMT
         type: number
         format: zto
-      - name: threshold
-        title: Threshold
-        type: number
-        format: zto
       - name: assessment
         title: Assessment
         type: text
+
+  - name: pairFootnote
+    title: ''
+    type: Html
+    visible: (showPairs)
 
   - name: notes
     title: Notes
