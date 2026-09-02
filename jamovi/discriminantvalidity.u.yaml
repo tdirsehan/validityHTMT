@@ -11,39 +11,43 @@ children:
     permitted: [numeric]
     stretchFactor: 1
     children:
-      - type: ListBox
-        name: constructs
-        height: large
-        addButton: '+ Construct'
-        selectable: true
-        templateName: htmt-construct-template
-        template:
-          type: LayoutBox
-          margin: normal
-          style: inline
-          children:
-            - type: ActionButton
-              name: assign
-              valueKey:
-                - assign
-              label: '→'
-              events:
-                changed: ./discriminantvalidity::assign_changed
-            - type: VariablesListBox
-              name: vars
-              valueKey:
-                - vars
-              isTarget: true
-              valueFilter: unique
-              height: auto
-              ghostText: Drag indicators here
-            - type: ActionButton
-              name: reset
-              valueKey:
-                - reset
-              label: Reset Construct
-              events:
-                changed: ./discriminantvalidity::reset_changed
+      - type: TargetLayoutBox
+        name: constructsTarget
+        label: Constructs
+        children:
+          - type: ListBox
+            name: constructs
+            height: large
+            addButton: '+ Construct'
+            selectable: true
+            templateName: htmt-construct-template
+            template:
+              type: LayoutBox
+              margin: normal
+              style: inline
+              children:
+                - type: ActionButton
+                  name: assign
+                  valueKey:
+                    - assign
+                  label: '→'
+                  events:
+                    changed: ./discriminantvalidity::assign_changed
+                - type: VariablesListBox
+                  name: vars
+                  valueKey:
+                    - vars
+                  isTarget: true
+                  valueFilter: unique
+                  height: auto
+                  ghostText: Drag indicators here
+                - type: ActionButton
+                  name: reset
+                  valueKey:
+                    - reset
+                  label: Reset Construct
+                  events:
+                    changed: ./discriminantvalidity::reset_changed
 
   - type: CollapseBox
     label: Options
