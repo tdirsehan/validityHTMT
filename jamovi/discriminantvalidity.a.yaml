@@ -15,12 +15,21 @@ options:
     title: Constructs
     type: Array
     default:
-      - []
-      - []
+      - vars: []
+        reset: false
+      - vars: []
+        reset: false
     template:
-      type: Variables
-      suggested: [continuous, ordinal]
-      permitted: [numeric]
+      type: Group
+      elements:
+        - name: vars
+          title: Indicators
+          type: Variables
+          suggested: [continuous, ordinal]
+          permitted: [numeric]
+        - name: reset
+          title: Reset Construct
+          type: Action
 
   - name: correlation
     title: Correlation
