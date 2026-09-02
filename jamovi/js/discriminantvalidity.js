@@ -25,13 +25,16 @@ function valueLength(control) {
 
 function initialVisibleCount(ui) {
     var count = 2;
+
     for (var i = 3; i <= 8; i++) {
         var vars = ui['c' + i];
         var name = ui['n' + i];
         var nameValue = name && name.value ? name.value() : ('Construct ' + i);
+
         if (valueLength(vars) > 0 || (nameValue && nameValue !== ('Construct ' + i)))
             count = i;
     }
+
     return count;
 }
 
@@ -42,75 +45,32 @@ function setVisibleCount(ui, count) {
     for (var i = 1; i <= 8; i++) {
         var visible = i <= count;
         setControlVisible(ui['t' + i], visible);
-        setControlVisible(ui['reset' + i], visible);
         setControlVisible(ui['n' + i], visible);
     }
 
-    setControlVisible(ui.addConstruct, count < 8);
+    if (ui.__htmtAddButton)
+        ui.__htmtAddButton.style.display = count < 8 ? '' : 'none';
 }
 
-function clearConstructNative(ui, index) {
-    var target = ui['t' + index];
+function clearConstruct(ui, index) {
     var list = ui['c' + index];
-
-    if (!target || !list || valueLength(list) === 0)
+    if (!list || !list.setValue)
         return;
 
-    var listEl = list.el;
-
-    try {
-        if (target.setTargetGrid)
-            target.setTargetGrid(list);
-
-        if (listEl && listEl.clearSelection)
-            listEl.clearSelection();
-        if (listEl && listEl.selectAll)
-            listEl.selectAll();
-
-        if (target.setButtonsMode)
-            target.setButtonsMode(false);
-        else
-            target.gainOnClick = false;
-
-        if (target.onAddButtonClick && listEl && listEl.selectedCellCount && listEl.selectedCellCount() > 0)
-            target.onAddButtonClick();
-        else if (list.setValue)
-            list.setValue([]);
-    }
-    finally {
-        if (target.setButtonsMode)
-            target.setButtonsMode(true);
-        else
-            target.gainOnClick = true;
-    }
-}
-
-function releaseActionButton(control) {
-    if (control && control.setValue)
-        control.setValue(false);
-}
-
-function resetOne(ui, index) {
-    clearConstructNative(ui, index);
-    releaseActionButton(ui['reset' + index]);
-}
-
-function addConstruct(ui) {
-    var count = ui.__htmtVisibleCount || initialVisibleCount(ui);
-    if (count < 8)
-        setVisibleCount(ui, count + 1);
-    releaseActionButton(ui.addConstruct);
+    // Because the VariablesListBox is still inside jamovi's native
+    // TargetLayoutBox, setValue([]) triggers the native target listeners.
+    // This clears the visible rows and returns the variables to the supplier.
+    list.setValue([]);
 }
 
 function resetAll(ui) {
     for (var i = 1; i <= 8; i++)
-        clearConstructNative(ui, i);
+        clearConstruct(ui, i);
 
     for (var j = 1; j <= 8; j++) {
         var nameControl = ui['n' + j];
         if (nameControl && nameControl.setValue)
             nameControl.setValue('Construct ' + j);
-        releaseActionButton(ui['reset' + j]);
     }
 
     if (ui.correlation && ui.correlation.setValue)
@@ -123,42 +83,73 @@ function resetAll(ui) {
         ui.showPairs.setValue(true);
 
     setVisibleCount(ui, 2);
-    releaseActionButton(ui.resetAll);
 }
 
-function bindButton(control, handler) {
-    var el = elementOf(control);
-    if (!el || el.getAttribute('data-htmt-bound') === '1')
+function makeButton(label, handler) {
+    var button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'jmv-action-button';
+    button.textContent = label;
+    button.style.cursor = 'pointer';
+    button.addEventListener('click', handler);
+    return button;
+}
+
+function installResetButton(ui, index) {
+    var target = ui['t' + index];
+    var targetEl = elementOf(target);
+    if (!targetEl || targetEl.querySelector('[data-htmt-reset="' + index + '"]'))
         return;
 
-    el.setAttribute('data-htmt-bound', '1');
-    el.addEventListener('click', function() {
-        setTimeout(handler, 0);
+    var holder = document.createElement('div');
+    holder.setAttribute('data-htmt-reset', String(index));
+    holder.style.cssText = 'margin-top:4px;';
+
+    var button = makeButton('Reset Construct', function() {
+        clearConstruct(ui, index);
     });
+
+    holder.appendChild(button);
+    targetEl.appendChild(holder);
 }
 
-function initialise(ui) {
-    setVisibleCount(ui, initialVisibleCount(ui));
+function installGlobalControls(ui) {
+    var root = elementOf(ui.uiControls);
+    if (!root || root.querySelector('[data-htmt-global-controls]'))
+        return;
 
-    bindButton(ui.addConstruct, function() {
-        addConstruct(ui);
+    var bar = document.createElement('div');
+    bar.setAttribute('data-htmt-global-controls', '1');
+    bar.style.cssText = 'display:flex;gap:8px;margin-top:8px;margin-bottom:8px;align-items:center;';
+
+    var addButton = makeButton('+ Construct', function() {
+        var count = ui.__htmtVisibleCount || 2;
+        if (count < 8)
+            setVisibleCount(ui, count + 1);
     });
 
-    bindButton(ui.resetAll, function() {
+    var resetAllButton = makeButton('Reset all', function() {
         resetAll(ui);
     });
 
-    for (var i = 1; i <= 8; i++) {
-        (function(index) {
-            bindButton(ui['reset' + index], function() {
-                resetOne(ui, index);
-            });
-        })(i);
-    }
+    ui.__htmtAddButton = addButton;
+    ui.__htmtResetAllButton = resetAllButton;
+
+    bar.appendChild(addButton);
+    bar.appendChild(resetAllButton);
+    root.appendChild(bar);
+}
+
+function initialise(ui) {
+    for (var i = 1; i <= 8; i++)
+        installResetButton(ui, i);
+
+    installGlobalControls(ui);
+    setVisibleCount(ui, initialVisibleCount(ui));
 }
 
 module.exports = {
-    uiInit_creating: function(ui, event) {
+    uiControls_creating: function(ui, event) {
         setTimeout(function() {
             initialise(ui);
         }, 0);
