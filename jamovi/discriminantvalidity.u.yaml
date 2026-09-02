@@ -1,63 +1,85 @@
 ---
 name: discriminantValidity
 title: Discriminant Validity (HTMT)
-jus: '2.0'
+jus: '3.0'
 compilerMode: tame
+events:
+  loaded: view_loaded
+  updated: view_updated
 children:
   - type: VariableSupplier
+    name: variablesupplier
     persistentItems: false
     suggested: [continuous, ordinal]
     permitted: [numeric]
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
+        name: t1
         label: Construct 1 indicators
         children:
           - type: VariablesListBox
             name: c1
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t2
         label: Construct 2 indicators
         children:
           - type: VariablesListBox
             name: c2
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t3
         label: Construct 3 indicators
         children:
           - type: VariablesListBox
             name: c3
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t4
         label: Construct 4 indicators
         children:
           - type: VariablesListBox
             name: c4
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t5
         label: Construct 5 indicators
         children:
           - type: VariablesListBox
             name: c5
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t6
         label: Construct 6 indicators
         children:
           - type: VariablesListBox
             name: c6
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t7
         label: Construct 7 indicators
         children:
           - type: VariablesListBox
             name: c7
             isTarget: true
+
       - type: TargetLayoutBox
+        name: t8
         label: Construct 8 indicators
         children:
           - type: VariablesListBox
             name: c8
             isTarget: true
+
+  - type: CustomControl
+    name: uiControls
 
   - type: CollapseBox
     label: Construct names
