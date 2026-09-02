@@ -44,4 +44,9 @@ children:
         name: threshold
       - type: CheckBox
         name: showPairs
+
+  - type: CustomControl
+    name: resetControl
+    events:
+      creating: ./discriminantvalidity.events::resetControl_creating
 ...
