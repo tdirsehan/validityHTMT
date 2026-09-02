@@ -1,53 +1,92 @@
 ---
 name: discriminantValidity
 title: Discriminant Validity (HTMT)
-jus: '3.0'
+jus: '2.0'
 compilerMode: tame
 children:
   - type: VariableSupplier
-    name: variablesupplier
     persistentItems: false
     suggested: [continuous, ordinal]
     permitted: [numeric]
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        name: constructsTarget
-        label: Constructs
+        label: Construct 1 indicators
         children:
-          - type: ListBox
-            name: constructs
-            height: large
-            addButton: '+ Construct'
-            selectable: true
-            templateName: htmt-construct-template
-            template:
-              type: LayoutBox
-              margin: normal
-              style: inline
-              children:
-                - type: ActionButton
-                  name: assign
-                  valueKey:
-                    - assign
-                  label: '→'
-                  events:
-                    changed: ./discriminantvalidity::assign_changed
-                - type: VariablesListBox
-                  name: vars
-                  valueKey:
-                    - vars
-                  isTarget: true
-                  valueFilter: unique
-                  height: auto
-                  ghostText: Drag indicators here
-                - type: ActionButton
-                  name: reset
-                  valueKey:
-                    - reset
-                  label: Reset Construct
-                  events:
-                    changed: ./discriminantvalidity::reset_changed
+          - type: VariablesListBox
+            name: c1
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 2 indicators
+        children:
+          - type: VariablesListBox
+            name: c2
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 3 indicators
+        children:
+          - type: VariablesListBox
+            name: c3
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 4 indicators
+        children:
+          - type: VariablesListBox
+            name: c4
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 5 indicators
+        children:
+          - type: VariablesListBox
+            name: c5
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 6 indicators
+        children:
+          - type: VariablesListBox
+            name: c6
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 7 indicators
+        children:
+          - type: VariablesListBox
+            name: c7
+            isTarget: true
+      - type: TargetLayoutBox
+        label: Construct 8 indicators
+        children:
+          - type: VariablesListBox
+            name: c8
+            isTarget: true
+
+  - type: CollapseBox
+    label: Construct names
+    collapsed: true
+    children:
+      - type: TextBox
+        name: n1
+        format: string
+      - type: TextBox
+        name: n2
+        format: string
+      - type: TextBox
+        name: n3
+        format: string
+      - type: TextBox
+        name: n4
+        format: string
+      - type: TextBox
+        name: n5
+        format: string
+      - type: TextBox
+        name: n6
+        format: string
+      - type: TextBox
+        name: n7
+        format: string
+      - type: TextBox
+        name: n8
+        format: string
 
   - type: CollapseBox
     label: Options
@@ -61,7 +100,4 @@ children:
         name: threshold
       - type: CheckBox
         name: showPairs
-
-  - type: CustomControl
-    name: resetControl
 ...
