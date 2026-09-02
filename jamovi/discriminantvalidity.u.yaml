@@ -3,6 +3,9 @@ name: discriminantValidity
 title: Discriminant Validity (HTMT)
 jus: '3.0'
 compilerMode: tame
+events:
+  loaded: view_loaded
+  updated: view_updated
 children:
   - type: VariableSupplier
     name: variablesupplier
