@@ -150,4 +150,7 @@ children:
         name: threshold
       - type: CheckBox
         name: showPairs
+
+  - type: CustomControl
+    name: uiInit
 ...
