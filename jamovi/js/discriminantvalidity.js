@@ -67,8 +67,6 @@ function findRowControls(ui, rowIndex, callback) {
                 resetControl = control;
         });
 
-        // Fallback for jamovi 2.4.x where template child names may not be
-        // exposed through getPropertyValue('name').
         if (!assignControl && item.controls.length > 0)
             assignControl = item.controls[0];
         if (!varsControl && item.controls.length > 1)
@@ -112,7 +110,7 @@ module.exports = {
         });
 
         findRowControls(ui, clickedIndex, function(assignControl, varsControl) {
-            if (!varsControl || !varsControl.setValue) {
+            if (!varsControl || !varsControl.addRawToOption) {
                 if (assignControl && assignControl.setValue)
                     assignControl.setValue(false);
                 return;
@@ -126,16 +124,24 @@ module.exports = {
                 if (varName === null || usedElsewhere[varName] || vars.indexOf(varName) !== -1)
                     return;
 
-                vars.push(varName);
-                if (supplierItem.used === undefined || supplierItem.used === null)
-                    supplierItem.used = 0;
-                supplierItem.used += 1;
-            });
+                var format = supplierItem && supplierItem.value ? supplierItem.value.format : null;
+                if (!format)
+                    return;
 
-            // Updating the row's VariablesListBox directly is important for
-            // jamovi 2.4.x: replacing the complete Array option updates the
-            // backend value but does not reliably repaint the nested list.
-            varsControl.setValue(vars);
+                var added = varsControl.addRawToOption(
+                    supplierItem.value.raw,
+                    null,
+                    false,
+                    format
+                );
+
+                if (added) {
+                    vars.push(varName);
+                    if (supplierItem.used === undefined || supplierItem.used === null)
+                        supplierItem.used = 0;
+                    supplierItem.used += 1;
+                }
+            });
 
             if (assignControl && assignControl.setValue)
                 assignControl.setValue(false);
