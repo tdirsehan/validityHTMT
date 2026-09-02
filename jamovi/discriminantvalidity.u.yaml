@@ -5,88 +5,32 @@ jus: '2.0'
 compilerMode: tame
 children:
   - type: VariableSupplier
+    name: variablesupplier
     persistentItems: false
     suggested: [continuous, ordinal]
     permitted: [numeric]
     stretchFactor: 1
     children:
       - type: TargetLayoutBox
-        label: Construct 1 indicators
+        label: Constructs
         children:
-          - type: VariablesListBox
-            name: c1
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 2 indicators
-        children:
-          - type: VariablesListBox
-            name: c2
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 3 indicators
-        children:
-          - type: VariablesListBox
-            name: c3
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 4 indicators
-        children:
-          - type: VariablesListBox
-            name: c4
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 5 indicators
-        children:
-          - type: VariablesListBox
-            name: c5
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 6 indicators
-        children:
-          - type: VariablesListBox
-            name: c6
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 7 indicators
-        children:
-          - type: VariablesListBox
-            name: c7
-            isTarget: true
-      - type: TargetLayoutBox
-        label: Construct 8 indicators
-        children:
-          - type: VariablesListBox
-            name: c8
-            isTarget: true
-
-  - type: CollapseBox
-    label: Construct names
-    collapsed: true
-    children:
-      - type: TextBox
-        name: n1
-        format: string
-      - type: TextBox
-        name: n2
-        format: string
-      - type: TextBox
-        name: n3
-        format: string
-      - type: TextBox
-        name: n4
-        format: string
-      - type: TextBox
-        name: n5
-        format: string
-      - type: TextBox
-        name: n6
-        format: string
-      - type: TextBox
-        name: n7
-        format: string
-      - type: TextBox
-        name: n8
-        format: string
+          - type: ListBox
+            name: constructs
+            height: large
+            addButton: '+ Construct'
+            selectable: true
+            templateName: htmt-construct-template
+            template:
+              type: LayoutBox
+              margin: normal
+              targetArea: true
+              children:
+                - type: VariablesListBox
+                  name: blockList
+                  isTarget: true
+                  valueFilter: unique
+                  height: auto
+                  ghostText: Drag indicators here
 
   - type: CollapseBox
     label: Options
