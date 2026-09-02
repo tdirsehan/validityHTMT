@@ -1,7 +1,7 @@
 ---
 name: discriminantValidity
 title: Discriminant Validity (HTMT)
-jus: '2.0'
+jus: '3.0'
 compilerMode: tame
 children:
   - type: VariableSupplier
@@ -38,8 +38,6 @@ children:
                   valueKey:
                     - reset
                   label: Reset Construct
-                  events:
-                    change: ./discriminantvalidity.events::constructReset_changed
 
   - type: CollapseBox
     label: Options
@@ -56,6 +54,4 @@ children:
 
   - type: CustomControl
     name: resetControl
-    events:
-      creating: ./discriminantvalidity.events::resetControl_creating
 ...
