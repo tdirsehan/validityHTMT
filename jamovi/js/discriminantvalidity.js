@@ -99,8 +99,10 @@ function resetOne(ui, index) {
 }
 
 module.exports = {
-    view_loaded: function(ui, event) {
-        setVisibleCount(ui, initialVisibleCount(ui));
+    uiInit_creating: function(ui, event) {
+        setTimeout(function() {
+            setVisibleCount(ui, initialVisibleCount(ui));
+        }, 0);
     },
 
     addConstruct_changed: function(ui, event) {
