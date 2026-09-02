@@ -26,11 +26,20 @@ children:
               targetArea: true
               children:
                 - type: VariablesListBox
-                  name: blockList
+                  name: vars
+                  valueKey:
+                    - vars
                   isTarget: true
                   valueFilter: unique
                   height: auto
                   ghostText: Drag indicators here
+                - type: ActionButton
+                  name: reset
+                  valueKey:
+                    - reset
+                  label: Reset Construct
+                  events:
+                    change: ./discriminantvalidity.events::constructReset_changed
 
   - type: CollapseBox
     label: Options
