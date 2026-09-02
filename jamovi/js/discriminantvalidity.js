@@ -9,25 +9,42 @@ function defaultConstructs() {
 
 module.exports = {
     reset_changed: function(ui, event) {
-        if (!ui.constructs || !ui.constructs.applyToItems)
+        if (!ui.constructs || !ui.constructs.value || !ui.constructs.setValue)
             return;
 
-        ui.constructs.applyToItems(0, function(item, index) {
-            if (!item || !item.controls || item.controls.length < 2)
-                return;
+        var current = ui.constructs.value();
+        if (!Array.isArray(current))
+            return;
 
-            var varsControl = item.controls[0];
-            var resetControl = item.controls[1];
-            var shouldReset = resetControl && resetControl.value && resetControl.value() === true;
+        var changed = false;
+        var next = current.map(function(item) {
+            if (!item || item.reset !== true)
+                return item;
 
-            if (!shouldReset)
-                return;
-
-            if (varsControl && varsControl.setValue)
-                varsControl.setValue([]);
-            if (resetControl && resetControl.setValue)
-                resetControl.setValue(false);
+            changed = true;
+            var copy = {};
+            Object.keys(item).forEach(function(key) {
+                copy[key] = item[key];
+            });
+            copy.vars = [];
+            copy.reset = false;
+            return copy;
         });
+
+        if (!changed)
+            return;
+
+        var options = ui.view && ui.view.model && ui.view.model.options;
+        if (options && options.beginEdit)
+            options.beginEdit();
+
+        try {
+            ui.constructs.setValue(next);
+        }
+        finally {
+            if (options && options.endEdit)
+                options.endEdit();
+        }
     },
 
     resetControl_creating: function(ui, event) {
