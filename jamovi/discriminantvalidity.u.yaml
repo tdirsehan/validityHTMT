@@ -18,11 +18,17 @@ children:
         selectable: true
         templateName: htmt-construct-template
         template:
-          type: TargetLayoutBox
-          label: Construct
+          type: LayoutBox
           margin: normal
-          targetArea: true
+          style: inline
           children:
+            - type: ActionButton
+              name: assign
+              valueKey:
+                - assign
+              label: '→'
+              events:
+                changed: ./discriminantvalidity::assign_changed
             - type: VariablesListBox
               name: vars
               valueKey:
