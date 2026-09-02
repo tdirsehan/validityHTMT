@@ -11,36 +11,23 @@ discriminantValidityClass <- R6::R6Class(
     private = list(
 
         .collectConstructs = function() {
-            raw <- self$options$constructs
-
-            if (is.null(raw))
-                raw <- list()
-
-            sets <- lapply(raw, function(x) {
-                if (is.null(x) || length(x) == 0)
-                    return(character(0))
-
-                # v0.2.0 stores each dynamic construct as a Group with
-                # `vars` and a UI-only `reset` Action. Keep compatibility
-                # with early beta/saved analyses that stored a character
-                # vector directly.
-                if (is.list(x) && !is.null(x$vars))
-                    x <- x$vars
-
-                if (is.null(x) || length(x) == 0)
-                    return(character(0))
-
-                if (is.character(x))
-                    return(unname(x))
-
-                unname(as.character(unlist(x, use.names = FALSE)))
-            })
+            sets <- list(
+                self$options$c1, self$options$c2, self$options$c3, self$options$c4,
+                self$options$c5, self$options$c6, self$options$c7, self$options$c8
+            )
+            names <- c(
+                self$options$n1, self$options$n2, self$options$n3, self$options$n4,
+                self$options$n5, self$options$n6, self$options$n7, self$options$n8
+            )
 
             keep <- vapply(sets, length, integer(1)) > 0
             sets <- sets[keep]
-            constructNames <- paste0("Construct ", seq_along(sets))
+            names <- names[keep]
 
-            list(sets = sets, names = constructNames)
+            names <- trimws(names)
+            names[names == ""] <- paste0("Construct ", which(names == ""))
+
+            list(sets = sets, names = make.unique(names))
         },
 
         .meanWithin = function(R, vars) {
@@ -66,49 +53,6 @@ discriminantValidityClass <- R6::R6Class(
             hetero / denom
         },
 
-        .matrixHtml = function(M, constructNames) {
-            fmt <- function(x) {
-                if (is.na(x) || !is.finite(x))
-                    return("&ndash;")
-                sprintf("%.3f", x)
-            }
-
-            header <- paste0(
-                "<tr><th style='text-align:left;padding:4px 8px;'>Construct</th>",
-                paste0(
-                    "<th style='text-align:right;padding:4px 8px;'>",
-                    constructNames,
-                    "</th>",
-                    collapse = ""
-                ),
-                "</tr>"
-            )
-
-            rows <- vapply(seq_along(constructNames), function(i) {
-                cells <- paste0(
-                    "<td style='text-align:right;padding:4px 8px;'>",
-                    vapply(seq_along(constructNames), function(j) fmt(M[i, j]), character(1)),
-                    "</td>",
-                    collapse = ""
-                )
-                paste0(
-                    "<tr><th style='text-align:left;padding:4px 8px;'>",
-                    constructNames[i],
-                    "</th>",
-                    cells,
-                    "</tr>"
-                )
-            }, character(1))
-
-            paste0(
-                "<div style='overflow-x:auto;'>",
-                "<table style='border-collapse:collapse;min-width:520px;'>",
-                "<thead>", header, "</thead><tbody>",
-                paste0(rows, collapse = ""),
-                "</tbody></table></div>"
-            )
-        },
-
         .run = function() {
             self$results$references$setContent(
                 paste0(
@@ -118,28 +62,20 @@ discriminantValidityClass <- R6::R6Class(
                 )
             )
 
+            spec <- private$.collectConstructs()
+            sets <- spec$sets
+            constructNames <- spec$names
+
             self$results$instructions$setContent(
                 paste0(
-                    "<p>Add constructs with the <b>+ Construct</b> button and drag indicators into each construct. ",
-                    "At least two non-empty constructs are required and each construct should contain at least two indicators. ",
+                    "<p>Select at least two constructs. Each construct should contain at least two indicators. ",
                     "HTMT is computed as the mean absolute heterotrait-heteromethod correlation divided by ",
                     "the geometric mean of the two mean absolute monotrait-heteromethod correlations.</p>"
                 )
             )
 
-            spec <- private$.collectConstructs()
-            sets <- spec$sets
-            constructNames <- spec$names
-
-            pairTab <- self$results$pairTable
-            pairTab$deleteRows()
-
-            if (length(sets) < 2) {
-                self$results$htmtMatrix$setContent(
-                    "<p>Add at least two constructs and assign indicators to them.</p>"
-                )
+            if (length(sets) < 2)
                 return()
-            }
 
             if (any(vapply(sets, length, integer(1)) < 2)) {
                 self$results$htmtMatrix$setError(
@@ -186,21 +122,25 @@ discriminantValidityClass <- R6::R6Class(
                 }
             }
 
-            self$results$htmtMatrix$setContent(
-                private$.matrixHtml(M, constructNames)
-            )
+            # Matrix table uses eight predeclared columns for compatibility
+            # with older jamovi compilers (including jamovi 2.4.x).
+            tab <- self$results$htmtMatrix
+            # jamovi 2.4.x tables begin with zero rows. setRow() only
+            # edits an existing row, so rows must be created with addRow().
+            # Clear rows first because the same analysis object is re-used
+            # when options change.
+            tab$deleteRows()
+            for (i in seq_len(k)) {
+                vals <- list(construct = constructNames[i])
+                for (j in seq_len(k))
+                    vals[[paste0("c", j)]] <- M[i, j]
+                tab$addRow(rowKey = paste0("construct_", i), values = vals)
+            }
 
             cut <- if (identical(self$options$threshold, "strict85")) 0.85 else 0.90
 
-            self$results$pairFootnote$setContent(
-                paste0(
-                    "<p><i>Note.</i> HTMT decision threshold = ",
-                    sprintf("%.2f", cut),
-                    ". Values below the selected threshold are conventionally interpreted as supporting discriminant validity. ",
-                    "The threshold should be treated as a diagnostic rather than a mechanical proof.</p>"
-                )
-            )
-
+            pairTab <- self$results$pairTable
+            pairTab$deleteRows()
             rowNo <- 1
             for (i in seq_len(k - 1)) {
                 for (j in (i + 1):k) {
@@ -217,6 +157,7 @@ discriminantValidityClass <- R6::R6Class(
                         constructA = constructNames[i],
                         constructB = constructNames[j],
                         htmt = h,
+                        threshold = cut,
                         assessment = assessment
                     ))
                     rowNo <- rowNo + 1
@@ -227,9 +168,11 @@ discriminantValidityClass <- R6::R6Class(
             missingLabel <- if (use == "complete.obs") "complete cases" else "pairwise complete observations"
             self$results$notes$setContent(
                 paste0(
-                    "<p>Constructs analysed: ", k,
-                    ". Correlation: ", methodLabel,
-                    "; missing data: ", missingLabel, ".</p>"
+                    "<p>Correlation: ", methodLabel,
+                    "; missing data: ", missingLabel,
+                    "; decision threshold: ", sprintf("%.2f", cut), ". ",
+                    "Values below the selected threshold are conventionally interpreted as supporting discriminant validity. ",
+                    "This threshold rule should be treated as a diagnostic rather than a mechanical proof.</p>"
                 )
             )
         }
