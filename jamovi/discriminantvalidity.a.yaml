@@ -29,7 +29,8 @@ options:
           permitted: [numeric]
         - name: reset
           title: Reset Construct
-          type: Action
+          type: Bool
+          default: false
 
   - name: correlation
     title: Correlation
