@@ -18,9 +18,6 @@ children:
           - type: VariablesListBox
             name: c1
             isTarget: true
-      - type: ActionButton
-        name: reset1
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t2
@@ -29,9 +26,6 @@ children:
           - type: VariablesListBox
             name: c2
             isTarget: true
-      - type: ActionButton
-        name: reset2
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t3
@@ -40,9 +34,6 @@ children:
           - type: VariablesListBox
             name: c3
             isTarget: true
-      - type: ActionButton
-        name: reset3
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t4
@@ -51,9 +42,6 @@ children:
           - type: VariablesListBox
             name: c4
             isTarget: true
-      - type: ActionButton
-        name: reset4
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t5
@@ -62,9 +50,6 @@ children:
           - type: VariablesListBox
             name: c5
             isTarget: true
-      - type: ActionButton
-        name: reset5
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t6
@@ -73,9 +58,6 @@ children:
           - type: VariablesListBox
             name: c6
             isTarget: true
-      - type: ActionButton
-        name: reset6
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t7
@@ -84,9 +66,6 @@ children:
           - type: VariablesListBox
             name: c7
             isTarget: true
-      - type: ActionButton
-        name: reset7
-        label: Reset Construct
 
       - type: TargetLayoutBox
         name: t8
@@ -95,19 +74,9 @@ children:
           - type: VariablesListBox
             name: c8
             isTarget: true
-      - type: ActionButton
-        name: reset8
-        label: Reset Construct
 
-  - type: LayoutBox
-    style: inline
-    children:
-      - type: ActionButton
-        name: addConstruct
-        label: '+ Construct'
-      - type: ActionButton
-        name: resetAll
-        label: Reset all
+  - type: CustomControl
+    name: uiControls
 
   - type: CollapseBox
     label: Construct names
@@ -150,7 +119,4 @@ children:
         name: threshold
       - type: CheckBox
         name: showPairs
-
-  - type: CustomControl
-    name: uiInit
 ...
