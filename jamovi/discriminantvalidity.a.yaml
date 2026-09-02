@@ -5,38 +5,91 @@ menuGroup: Factor
 menuSubgroup: Validity
 menuTitle: Discriminant Validity (HTMT)
 jas: '1.2'
-version: '0.2.0'
+version: '0.1.5'
 
 options:
   - name: data
     type: Data
 
-  - name: constructs
-    title: Constructs
-    type: Array
-    default:
-      - vars: []
-        assign: false
-        reset: false
-      - vars: []
-        assign: false
-        reset: false
-    template:
-      type: Group
-      elements:
-        - name: vars
-          title: Indicators
-          type: Variables
-          suggested: [continuous, ordinal]
-          permitted: [numeric]
-        - name: assign
-          title: Add selected indicators
-          type: Bool
-          default: false
-        - name: reset
-          title: Reset Construct
-          type: Bool
-          default: false
+  - name: c1
+    title: Construct 1 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n1
+    title: Construct 1 name
+    type: String
+    default: Construct 1
+
+  - name: c2
+    title: Construct 2 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n2
+    title: Construct 2 name
+    type: String
+    default: Construct 2
+
+  - name: c3
+    title: Construct 3 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n3
+    title: Construct 3 name
+    type: String
+    default: Construct 3
+
+  - name: c4
+    title: Construct 4 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n4
+    title: Construct 4 name
+    type: String
+    default: Construct 4
+
+  - name: c5
+    title: Construct 5 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n5
+    title: Construct 5 name
+    type: String
+    default: Construct 5
+
+  - name: c6
+    title: Construct 6 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n6
+    title: Construct 6 name
+    type: String
+    default: Construct 6
+
+  - name: c7
+    title: Construct 7 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n7
+    title: Construct 7 name
+    type: String
+    default: Construct 7
+
+  - name: c8
+    title: Construct 8 indicators
+    type: Variables
+    suggested: [continuous, ordinal]
+    permitted: [numeric]
+  - name: n8
+    title: Construct 8 name
+    type: String
+    default: Construct 8
 
   - name: correlation
     title: Correlation
