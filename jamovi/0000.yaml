@@ -1,0 +1,18 @@
+---
+name: validityHTMT
+title: Validity HTMT
+version: 0.1.7
+jms: '1.0'
+authors:
+  - Taskin Dirsehan
+description: >
+  Discriminant validity assessment using the Heterotrait-Monotrait ratio
+  of correlations (HTMT).
+analyses:
+  - title: Discriminant Validity (HTMT)
+    name: discriminantValidity
+    ns: validityHTMT
+    menuGroup: Factor
+    menuSubgroup: Validity
+    menuTitle: Discriminant Validity (HTMT)
+...

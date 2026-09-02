@@ -1,0 +1,81 @@
+---
+name: discriminantValidity
+title: Discriminant Validity (HTMT)
+jrs: '1.1'
+
+items:
+  - name: instructions
+    title: Discriminant Validity (HTMT)
+    type: Html
+
+  - name: htmtMatrix
+    title: HTMT Matrix
+    type: Table
+    columns:
+      - name: construct
+        title: Construct
+        type: text
+      - name: c1
+        title: Construct 1
+        type: number
+        format: zto
+      - name: c2
+        title: Construct 2
+        type: number
+        format: zto
+      - name: c3
+        title: Construct 3
+        type: number
+        format: zto
+      - name: c4
+        title: Construct 4
+        type: number
+        format: zto
+      - name: c5
+        title: Construct 5
+        type: number
+        format: zto
+      - name: c6
+        title: Construct 6
+        type: number
+        format: zto
+      - name: c7
+        title: Construct 7
+        type: number
+        format: zto
+      - name: c8
+        title: Construct 8
+        type: number
+        format: zto
+
+  - name: pairTable
+    title: Pairwise Assessment
+    type: Table
+    visible: (showPairs)
+    columns:
+      - name: constructA
+        title: Construct A
+        type: text
+      - name: constructB
+        title: Construct B
+        type: text
+      - name: htmt
+        title: HTMT
+        type: number
+        format: zto
+      - name: threshold
+        title: Threshold
+        type: number
+        format: zto
+      - name: assessment
+        title: Assessment
+        type: text
+
+  - name: notes
+    title: Notes
+    type: Html
+
+  - name: references
+    title: References
+    type: Html
+...
