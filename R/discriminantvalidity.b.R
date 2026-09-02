@@ -20,6 +20,16 @@ discriminantValidityClass <- R6::R6Class(
                 if (is.null(x) || length(x) == 0)
                     return(character(0))
 
+                # v0.2.0 stores each dynamic construct as a Group with
+                # `vars` and a UI-only `reset` Action. Keep compatibility
+                # with early beta/saved analyses that stored a character
+                # vector directly.
+                if (is.list(x) && !is.null(x$vars))
+                    x <- x$vars
+
+                if (is.null(x) || length(x) == 0)
+                    return(character(0))
+
                 if (is.character(x))
                     return(unname(x))
 
