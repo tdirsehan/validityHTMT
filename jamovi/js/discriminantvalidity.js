@@ -7,39 +7,15 @@ function defaultConstructs() {
     ];
 }
 
-function supplierRaw(item) {
-    if (!item || !item.value)
-        return null;
-    if (item.value.raw !== undefined && item.value.raw !== null)
-        return item.value.raw;
-    if (item.value.toString)
-        return item.value.toString();
-    return null;
-}
-
 function refreshSupplier(ui) {
     if (!ui.variablesupplier)
         return;
+
     if (ui.variablesupplier.filterSuppliersList)
         ui.variablesupplier.filterSuppliersList(true);
+
     if (ui.variablesupplier.supplier && ui.variablesupplier.supplier.clearSelection)
         ui.variablesupplier.supplier.clearSelection();
-}
-
-function releaseVars(ui, vars) {
-    if (!ui.variablesupplier || !Array.isArray(ui.variablesupplier._items) || !Array.isArray(vars))
-        return;
-
-    vars.forEach(function(varName) {
-        for (var i = 0; i < ui.variablesupplier._items.length; i++) {
-            var supplierItem = ui.variablesupplier._items[i];
-            if (supplierRaw(supplierItem) === varName) {
-                if (supplierItem.used && supplierItem.used > 0)
-                    supplierItem.used -= 1;
-                break;
-            }
-        }
-    });
 }
 
 function findRowControls(ui, rowIndex, callback) {
@@ -78,119 +54,92 @@ function findRowControls(ui, rowIndex, callback) {
     }, 1);
 }
 
+function clickedRow(current, key) {
+    for (var i = 0; i < current.length; i++) {
+        if (current[i] && current[i][key] === true)
+            return i;
+    }
+    return -1;
+}
+
 module.exports = {
     assign_changed: function(ui, event) {
-        if (!ui.constructs || !ui.constructs.value ||
-            !ui.variablesupplier || !ui.variablesupplier.getSelectedItems)
+        if (!ui.constructs || !ui.constructs.value || !ui.constructsTarget)
             return;
 
         var current = ui.constructs.value();
         if (!Array.isArray(current))
             return;
 
-        var clickedIndex = -1;
-        for (var i = 0; i < current.length; i++) {
-            if (current[i] && current[i].assign === true) {
-                clickedIndex = i;
-                break;
-            }
-        }
-
-        if (clickedIndex < 0)
+        var rowIndex = clickedRow(current, 'assign');
+        if (rowIndex < 0)
             return;
 
-        var selected = ui.variablesupplier.getSelectedItems();
-        var usedElsewhere = {};
-        current.forEach(function(item, index) {
-            if (!item || !Array.isArray(item.vars) || index === clickedIndex)
-                return;
-            item.vars.forEach(function(v) {
-                usedElsewhere[v] = true;
-            });
-        });
+        findRowControls(ui, rowIndex, function(assignControl, varsControl) {
+            try {
+                if (!varsControl)
+                    return;
 
-        findRowControls(ui, clickedIndex, function(assignControl, varsControl) {
-            if (!varsControl || !varsControl.addRawToOption) {
+                // Use the same native transfer path used by jamovi's ordinary
+                // TargetLayoutBox controls. This keeps the nested target list,
+                // supplier state, and visible rows in sync on jamovi 2.4.x.
+                if (ui.constructsTarget.setTargetGrid)
+                    ui.constructsTarget.setTargetGrid(varsControl);
+                if (ui.constructsTarget.setButtonsMode)
+                    ui.constructsTarget.setButtonsMode(true);
+                else
+                    ui.constructsTarget.gainOnClick = true;
+
+                if (ui.constructsTarget.onAddButtonClick)
+                    ui.constructsTarget.onAddButtonClick();
+            }
+            finally {
                 if (assignControl && assignControl.setValue)
                     assignControl.setValue(false);
-                return;
             }
-
-            var existing = varsControl.value && varsControl.value();
-            var vars = Array.isArray(existing) ? existing.slice() : [];
-
-            selected.forEach(function(supplierItem) {
-                var varName = supplierRaw(supplierItem);
-                if (varName === null || usedElsewhere[varName] || vars.indexOf(varName) !== -1)
-                    return;
-
-                var format = supplierItem && supplierItem.value ? supplierItem.value.format : null;
-                if (!format)
-                    return;
-
-                var added = varsControl.addRawToOption(
-                    supplierItem.value.raw,
-                    null,
-                    false,
-                    format
-                );
-
-                if (added) {
-                    vars.push(varName);
-                    if (supplierItem.used === undefined || supplierItem.used === null)
-                        supplierItem.used = 0;
-                    supplierItem.used += 1;
-                }
-            });
-
-            if (assignControl && assignControl.setValue)
-                assignControl.setValue(false);
         });
-
-        refreshSupplier(ui);
     },
 
     reset_changed: function(ui, event) {
-        if (!ui.constructs || !ui.constructs.value)
+        if (!ui.constructs || !ui.constructs.value || !ui.constructsTarget)
             return;
 
         var current = ui.constructs.value();
         if (!Array.isArray(current))
             return;
 
-        var clickedIndex = -1;
-        for (var i = 0; i < current.length; i++) {
-            if (current[i] && current[i].reset === true) {
-                clickedIndex = i;
-                break;
-            }
-        }
-
-        if (clickedIndex < 0)
+        var rowIndex = clickedRow(current, 'reset');
+        if (rowIndex < 0)
             return;
 
-        findRowControls(ui, clickedIndex, function(assignControl, varsControl, resetControl) {
-            var vars = [];
-            if (varsControl && varsControl.value) {
-                var currentVars = varsControl.value();
-                if (Array.isArray(currentVars))
-                    vars = currentVars.slice();
-            }
-            else if (current[clickedIndex] && Array.isArray(current[clickedIndex].vars)) {
-                vars = current[clickedIndex].vars.slice();
-            }
+        findRowControls(ui, rowIndex, function(assignControl, varsControl, resetControl) {
+            try {
+                if (!varsControl)
+                    return;
 
-            releaseVars(ui, vars);
+                if (ui.constructsTarget.setTargetGrid)
+                    ui.constructsTarget.setTargetGrid(varsControl);
 
-            if (varsControl && varsControl.setValue)
-                varsControl.setValue([]);
-            if (assignControl && assignControl.setValue)
-                assignControl.setValue(false);
-            if (resetControl && resetControl.setValue)
-                resetControl.setValue(false);
+                if (varsControl.el && varsControl.el.selectAll)
+                    varsControl.el.selectAll();
+
+                if (ui.constructsTarget.setButtonsMode)
+                    ui.constructsTarget.setButtonsMode(false);
+                else
+                    ui.constructsTarget.gainOnClick = false;
+
+                if (ui.constructsTarget.onAddButtonClick &&
+                    varsControl.el && varsControl.el.selectedCellCount &&
+                    varsControl.el.selectedCellCount() > 0)
+                    ui.constructsTarget.onAddButtonClick();
+            }
+            finally {
+                if (assignControl && assignControl.setValue)
+                    assignControl.setValue(false);
+                if (resetControl && resetControl.setValue)
+                    resetControl.setValue(false);
+            }
         });
-
-        refreshSupplier(ui);
     },
 
     resetControl_creating: function(ui, event) {
@@ -210,11 +159,6 @@ module.exports = {
                 options.beginEdit();
 
             try {
-                if (ui.variablesupplier && Array.isArray(ui.variablesupplier._items)) {
-                    ui.variablesupplier._items.forEach(function(item) {
-                        item.used = 0;
-                    });
-                }
                 if (ui.constructs)
                     ui.constructs.setValue(defaultConstructs());
                 if (ui.correlation)
