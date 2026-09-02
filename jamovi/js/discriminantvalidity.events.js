@@ -37,7 +37,7 @@ module.exports = {
 
         var button = document.createElement('button');
         button.type = 'button';
-        button.textContent = 'Reset';
+        button.textContent = 'Reset all';
         button.setAttribute('data-validity-htmt-reset', '1');
         button.style.cssText = 'margin-top:8px;padding:5px 12px;cursor:pointer;';
 
