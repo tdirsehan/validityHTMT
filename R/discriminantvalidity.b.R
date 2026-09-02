@@ -16,10 +16,6 @@ discriminantValidityClass <- R6::R6Class(
             if (is.null(raw))
                 raw <- list()
 
-            # Array<Variables> options are represented as a list whose items
-            # are character vectors (one vector per construct). Normalise the
-            # values defensively because older jamovi versions can return an
-            # empty item as list() rather than character(0).
             sets <- lapply(raw, function(x) {
                 if (is.null(x) || length(x) == 0)
                     return(character(0))
@@ -180,13 +176,20 @@ discriminantValidityClass <- R6::R6Class(
                 }
             }
 
-            # Render the matrix as HTML so the number of rows and columns can
-            # grow with the user's construct list without a predeclared limit.
             self$results$htmtMatrix$setContent(
                 private$.matrixHtml(M, constructNames)
             )
 
             cut <- if (identical(self$options$threshold, "strict85")) 0.85 else 0.90
+
+            self$results$pairFootnote$setContent(
+                paste0(
+                    "<p><i>Note.</i> HTMT decision threshold = ",
+                    sprintf("%.2f", cut),
+                    ". Values below the selected threshold are conventionally interpreted as supporting discriminant validity. ",
+                    "The threshold should be treated as a diagnostic rather than a mechanical proof.</p>"
+                )
+            )
 
             rowNo <- 1
             for (i in seq_len(k - 1)) {
@@ -204,7 +207,6 @@ discriminantValidityClass <- R6::R6Class(
                         constructA = constructNames[i],
                         constructB = constructNames[j],
                         htmt = h,
-                        threshold = cut,
                         assessment = assessment
                     ))
                     rowNo <- rowNo + 1
@@ -217,10 +219,7 @@ discriminantValidityClass <- R6::R6Class(
                 paste0(
                     "<p>Constructs analysed: ", k,
                     ". Correlation: ", methodLabel,
-                    "; missing data: ", missingLabel,
-                    "; decision threshold: ", sprintf("%.2f", cut), ". ",
-                    "Values below the selected threshold are conventionally interpreted as supporting discriminant validity. ",
-                    "This threshold rule should be treated as a diagnostic rather than a mechanical proof.</p>"
+                    "; missing data: ", missingLabel, ".</p>"
                 )
             )
         }
