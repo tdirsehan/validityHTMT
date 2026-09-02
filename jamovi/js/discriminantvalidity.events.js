@@ -1,6 +1,35 @@
 'use strict';
 
+function defaultConstructs() {
+    return [
+        { vars: [], reset: false },
+        { vars: [], reset: false }
+    ];
+}
+
 module.exports = {
+    constructReset_changed: function(ui, event) {
+        if (!ui.constructs || !ui.constructs.applyToItems)
+            return;
+
+        ui.constructs.applyToItems(0, function(item, index) {
+            if (!item || !item.controls || item.controls.length < 2)
+                return;
+
+            var varsControl = item.controls[0];
+            var resetControl = item.controls[1];
+            var shouldReset = resetControl && resetControl.value && resetControl.value() === true;
+
+            if (!shouldReset)
+                return;
+
+            if (varsControl && varsControl.setValue)
+                varsControl.setValue([]);
+            if (resetControl && resetControl.setValue)
+                resetControl.setValue(false);
+        });
+    },
+
     resetControl_creating: function(ui, event) {
         var root = ui.resetControl && ui.resetControl.$el && ui.resetControl.$el[0];
         if (!root || root.querySelector('[data-validity-htmt-reset]'))
@@ -19,7 +48,7 @@ module.exports = {
 
             try {
                 if (ui.constructs)
-                    ui.constructs.setValue([[], []]);
+                    ui.constructs.setValue(defaultConstructs());
                 if (ui.correlation)
                     ui.correlation.setValue('pearson');
                 if (ui.missing)
