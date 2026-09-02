@@ -77,6 +77,8 @@ children:
 
   - type: CustomControl
     name: uiControls
+    events:
+      creating: ./discriminantvalidity::uiControls_creating
 
   - type: CollapseBox
     label: Construct names
