@@ -16,8 +16,10 @@ options:
     type: Array
     default:
       - vars: []
+        assign: false
         reset: false
       - vars: []
+        assign: false
         reset: false
     template:
       type: Group
@@ -27,6 +29,10 @@ options:
           type: Variables
           suggested: [continuous, ordinal]
           permitted: [numeric]
+        - name: assign
+          title: Add selected indicators
+          type: Bool
+          default: false
         - name: reset
           title: Reset Construct
           type: Bool
