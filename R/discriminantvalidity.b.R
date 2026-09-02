@@ -97,7 +97,15 @@ discriminantValidityClass <- R6::R6Class(
             }
 
             dat <- self$data[, allVars, drop = FALSE]
-            dat <- as.data.frame(lapply(dat, function(x) as.numeric(x)))
+            # Preserve the exact jamovi variable names (including @, spaces,
+            # Turkish characters, etc.) while coercing columns to numeric.
+            # Without check.names = FALSE, base R may silently sanitise names,
+            # which makes R[a, b] fail with "subscript out of bounds" later.
+            dat <- as.data.frame(
+                lapply(dat, function(x) as.numeric(x)),
+                check.names = FALSE
+            )
+            names(dat) <- allVars
 
             use <- if (identical(self$options$missing, "complete")) "complete.obs" else "pairwise.complete.obs"
             method <- if (identical(self$options$correlation, "spearman")) "spearman" else "pearson"
