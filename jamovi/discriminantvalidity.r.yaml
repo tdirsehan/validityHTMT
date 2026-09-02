@@ -10,43 +10,7 @@ items:
 
   - name: htmtMatrix
     title: HTMT Matrix
-    type: Table
-    columns:
-      - name: construct
-        title: Construct
-        type: text
-      - name: c1
-        title: Construct 1
-        type: number
-        format: zto
-      - name: c2
-        title: Construct 2
-        type: number
-        format: zto
-      - name: c3
-        title: Construct 3
-        type: number
-        format: zto
-      - name: c4
-        title: Construct 4
-        type: number
-        format: zto
-      - name: c5
-        title: Construct 5
-        type: number
-        format: zto
-      - name: c6
-        title: Construct 6
-        type: number
-        format: zto
-      - name: c7
-        title: Construct 7
-        type: number
-        format: zto
-      - name: c8
-        title: Construct 8
-        type: number
-        format: zto
+    type: Html
 
   - name: pairTable
     title: Pairwise Assessment
