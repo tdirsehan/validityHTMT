@@ -53,13 +53,10 @@ function clearConstructNative(ui, index) {
     var target = ui['t' + index];
     var list = ui['c' + index];
 
-    if (!target || !list)
+    if (!target || !list || valueLength(list) === 0)
         return;
 
     var listEl = list.el;
-    var count = valueLength(list);
-    if (count === 0)
-        return;
 
     try {
         if (target.setTargetGrid)
@@ -88,60 +85,82 @@ function clearConstructNative(ui, index) {
     }
 }
 
-function finishButton(control) {
+function releaseActionButton(control) {
     if (control && control.setValue)
         control.setValue(false);
 }
 
 function resetOne(ui, index) {
     clearConstructNative(ui, index);
-    finishButton(ui['reset' + index]);
+    releaseActionButton(ui['reset' + index]);
+}
+
+function addConstruct(ui) {
+    var count = ui.__htmtVisibleCount || initialVisibleCount(ui);
+    if (count < 8)
+        setVisibleCount(ui, count + 1);
+    releaseActionButton(ui.addConstruct);
+}
+
+function resetAll(ui) {
+    for (var i = 1; i <= 8; i++)
+        clearConstructNative(ui, i);
+
+    for (var j = 1; j <= 8; j++) {
+        var nameControl = ui['n' + j];
+        if (nameControl && nameControl.setValue)
+            nameControl.setValue('Construct ' + j);
+        releaseActionButton(ui['reset' + j]);
+    }
+
+    if (ui.correlation && ui.correlation.setValue)
+        ui.correlation.setValue('pearson');
+    if (ui.missing && ui.missing.setValue)
+        ui.missing.setValue('pairwise');
+    if (ui.threshold && ui.threshold.setValue)
+        ui.threshold.setValue('liberal90');
+    if (ui.showPairs && ui.showPairs.setValue)
+        ui.showPairs.setValue(true);
+
+    setVisibleCount(ui, 2);
+    releaseActionButton(ui.resetAll);
+}
+
+function bindButton(control, handler) {
+    var el = elementOf(control);
+    if (!el || el.getAttribute('data-htmt-bound') === '1')
+        return;
+
+    el.setAttribute('data-htmt-bound', '1');
+    el.addEventListener('click', function() {
+        setTimeout(handler, 0);
+    });
+}
+
+function initialise(ui) {
+    setVisibleCount(ui, initialVisibleCount(ui));
+
+    bindButton(ui.addConstruct, function() {
+        addConstruct(ui);
+    });
+
+    bindButton(ui.resetAll, function() {
+        resetAll(ui);
+    });
+
+    for (var i = 1; i <= 8; i++) {
+        (function(index) {
+            bindButton(ui['reset' + index], function() {
+                resetOne(ui, index);
+            });
+        })(i);
+    }
 }
 
 module.exports = {
     uiInit_creating: function(ui, event) {
         setTimeout(function() {
-            setVisibleCount(ui, initialVisibleCount(ui));
+            initialise(ui);
         }, 0);
-    },
-
-    addConstruct_changed: function(ui, event) {
-        var count = ui.__htmtVisibleCount || initialVisibleCount(ui);
-        if (count < 8)
-            setVisibleCount(ui, count + 1);
-        finishButton(ui.addConstruct);
-    },
-
-    reset1_changed: function(ui, event) { resetOne(ui, 1); },
-    reset2_changed: function(ui, event) { resetOne(ui, 2); },
-    reset3_changed: function(ui, event) { resetOne(ui, 3); },
-    reset4_changed: function(ui, event) { resetOne(ui, 4); },
-    reset5_changed: function(ui, event) { resetOne(ui, 5); },
-    reset6_changed: function(ui, event) { resetOne(ui, 6); },
-    reset7_changed: function(ui, event) { resetOne(ui, 7); },
-    reset8_changed: function(ui, event) { resetOne(ui, 8); },
-
-    resetAll_changed: function(ui, event) {
-        for (var i = 1; i <= 8; i++)
-            clearConstructNative(ui, i);
-
-        for (var j = 1; j <= 8; j++) {
-            var nameControl = ui['n' + j];
-            if (nameControl && nameControl.setValue)
-                nameControl.setValue('Construct ' + j);
-            finishButton(ui['reset' + j]);
-        }
-
-        if (ui.correlation && ui.correlation.setValue)
-            ui.correlation.setValue('pearson');
-        if (ui.missing && ui.missing.setValue)
-            ui.missing.setValue('pairwise');
-        if (ui.threshold && ui.threshold.setValue)
-            ui.threshold.setValue('liberal90');
-        if (ui.showPairs && ui.showPairs.setValue)
-            ui.showPairs.setValue(true);
-
-        setVisibleCount(ui, 2);
-        finishButton(ui.resetAll);
     }
 };
