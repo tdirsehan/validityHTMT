@@ -46,6 +46,9 @@ function setVisibleCount(ui, count) {
         var visible = i <= count;
         setControlVisible(ui['t' + i], visible);
         setControlVisible(ui['n' + i], visible);
+
+        if (ui.__htmtResetHolders && ui.__htmtResetHolders[i])
+            ui.__htmtResetHolders[i].style.display = visible ? '' : 'none';
     }
 
     if (ui.__htmtAddButton)
@@ -57,9 +60,6 @@ function clearConstruct(ui, index) {
     if (!list || !list.setValue)
         return;
 
-    // Because the VariablesListBox is still inside jamovi's native
-    // TargetLayoutBox, setValue([]) triggers the native target listeners.
-    // This clears the visible rows and returns the variables to the supplier.
     list.setValue([]);
 }
 
@@ -96,31 +96,40 @@ function makeButton(label, handler) {
 }
 
 function installResetButton(ui, index) {
-    var target = ui['t' + index];
-    var targetEl = elementOf(target);
-    if (!targetEl || targetEl.querySelector('[data-htmt-reset="' + index + '"]'))
+    var targetEl = elementOf(ui['t' + index]);
+    if (!targetEl || !targetEl.parentNode)
+        return;
+
+    if (!ui.__htmtResetHolders)
+        ui.__htmtResetHolders = {};
+
+    if (ui.__htmtResetHolders[index])
         return;
 
     var holder = document.createElement('div');
     holder.setAttribute('data-htmt-reset', String(index));
-    holder.style.cssText = 'margin-top:4px;';
+    holder.style.cssText = 'margin:4px 0 8px 0;';
 
     var button = makeButton('Reset Construct', function() {
         clearConstruct(ui, index);
     });
 
     holder.appendChild(button);
-    targetEl.appendChild(holder);
+    targetEl.parentNode.insertBefore(holder, targetEl.nextSibling);
+    ui.__htmtResetHolders[index] = holder;
 }
 
 function installGlobalControls(ui) {
     var root = elementOf(ui.uiControls);
-    if (!root || root.querySelector('[data-htmt-global-controls]'))
+    if (!root)
+        return;
+
+    if (ui.__htmtGlobalBar)
         return;
 
     var bar = document.createElement('div');
     bar.setAttribute('data-htmt-global-controls', '1');
-    bar.style.cssText = 'display:flex;gap:8px;margin-top:8px;margin-bottom:8px;align-items:center;';
+    bar.style.cssText = 'display:flex;gap:8px;margin:8px 0;align-items:center;';
 
     var addButton = makeButton('+ Construct', function() {
         var count = ui.__htmtVisibleCount || 2;
@@ -134,6 +143,7 @@ function installGlobalControls(ui) {
 
     ui.__htmtAddButton = addButton;
     ui.__htmtResetAllButton = resetAllButton;
+    ui.__htmtGlobalBar = bar;
 
     bar.appendChild(addButton);
     bar.appendChild(resetAllButton);
@@ -149,9 +159,12 @@ function initialise(ui) {
 }
 
 module.exports = {
-    uiControls_creating: function(ui, event) {
-        setTimeout(function() {
-            initialise(ui);
-        }, 0);
+    view_loaded: function(ui, event) {
+        initialise(ui);
+    },
+
+    view_updated: function(ui, event) {
+        initialise(ui);
+        setVisibleCount(ui, initialVisibleCount(ui));
     }
 };
