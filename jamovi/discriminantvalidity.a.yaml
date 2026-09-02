@@ -5,7 +5,7 @@ menuGroup: Factor
 menuSubgroup: Validity
 menuTitle: Discriminant Validity (HTMT)
 jas: '1.2'
-version: '0.1.5'
+version: '0.2.0'
 
 options:
   - name: data
@@ -90,6 +90,49 @@ options:
     title: Construct 8 name
     type: String
     default: Construct 8
+
+  - name: reset1
+    title: Reset Construct 1
+    type: Bool
+    default: false
+  - name: reset2
+    title: Reset Construct 2
+    type: Bool
+    default: false
+  - name: reset3
+    title: Reset Construct 3
+    type: Bool
+    default: false
+  - name: reset4
+    title: Reset Construct 4
+    type: Bool
+    default: false
+  - name: reset5
+    title: Reset Construct 5
+    type: Bool
+    default: false
+  - name: reset6
+    title: Reset Construct 6
+    type: Bool
+    default: false
+  - name: reset7
+    title: Reset Construct 7
+    type: Bool
+    default: false
+  - name: reset8
+    title: Reset Construct 8
+    type: Bool
+    default: false
+
+  - name: addConstruct
+    title: Add Construct
+    type: Bool
+    default: false
+
+  - name: resetAll
+    title: Reset all
+    type: Bool
+    default: false
 
   - name: correlation
     title: Correlation
