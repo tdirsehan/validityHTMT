@@ -6,15 +6,21 @@ Developed by Prof. Dr. Taşkın Dirsehan.
 
 ## Current features
 
-- Up to 8 reflective constructs.
-- Drag-and-drop assignment of indicators to constructs.
-- User-defined construct names.
+- Dynamic construct creation with a **+ Construct** button.
+- No hard-coded upper limit on the number of constructs.
+- Drag-and-drop assignment of indicators to each construct.
 - Pearson or Spearman correlations.
 - Pairwise-complete or complete-case missing-data handling.
-- Square HTMT matrix.
+- Dynamic square HTMT matrix.
 - Optional pairwise interpretation table.
 - Selectable 0.85 or 0.90 decision threshold.
 - Checks for repeated indicators and constructs with fewer than two items.
+
+## Dynamic constructs (v0.2.0 beta)
+
+The analysis opens with two empty construct blocks. Clicking **+ Construct** appends another construct block. Constructs can be added as needed rather than being predeclared as Construct 1 through Construct 8.
+
+For compatibility with jamovi's dynamic option system, constructs are stored as an `Array` whose items are variable sets. The HTMT matrix is rendered dynamically so its dimensions follow the number of non-empty constructs.
 
 ## HTMT implemented
 
@@ -40,32 +46,29 @@ jmvtools::install()
 
 ## Suggested validation before release
 
-1. Compare several datasets against SmartPLS / ADANCO / R implementations of HTMT.
-2. Add bootstrap confidence intervals (HTMT inference) as a second-stage feature.
-3. Consider polychoric correlations for ordinal indicators.
-4. Add example `.omv` data and documentation before library submission.
+1. Compile and test the v0.2.0 dynamic-construct beta on jamovi 2.4.x and a current jamovi release.
+2. Compare several datasets against SmartPLS / ADANCO / independent R implementations of HTMT.
+3. Add bootstrap confidence intervals (HTMT inference) as a second-stage feature.
+4. Consider polychoric correlations for ordinal indicators.
+5. Add example `.omv` data and documentation before jamovi Library submission.
 
 ## Reference
 
 Henseler, J., Ringle, C. M., & Sarstedt, M. (2015). A new criterion for assessing discriminant validity in variance-based structural equation modeling. *Journal of the Academy of Marketing Science*, *43*(1), 115–135.
 
-## v0.1.2 compatibility fix
+## Version history
 
-The jamovi analysis schema uses `permitted: [numeric]` for numeric variable targets, while `continuous` and `ordinal` are measure-type suggestions. The UI variable supplier has also been reorganized so all construct indicator targets are children of a single numeric VariableSupplier.
+### v0.2.0 beta
+- Replaced the fixed eight-construct interface with dynamic construct blocks.
+- Added a **+ Construct** button.
+- Removed the hard-coded construct-count limit.
+- Changed the HTMT matrix to a dynamic HTML matrix so rows and columns grow with the construct list.
 
+### v0.1.7
+- Prepared source repository for public release and added build-artifact exclusions.
 
-## v0.1.4 compatibility note
+### v0.1.6
+- Added the Henseler, Ringle, and Sarstedt (2015) reference to the jamovi output.
 
-The custom UI no longer uses `populate: manual` for `VariableSupplier`. In jamovi this property requires a JavaScript `updated` event handler; the module does not need manual supplier population, so automatic population is used for compatibility with jamovi 2.4.x.
-
-
-## v0.1.5
-- Fixed jamovi 2.4.x result-table population: tables now use `addRow()` after `deleteRows()` instead of calling `setRow()` on zero-row tables.
-
-
-## v0.1.6
-- Added a References section to the jamovi output with the Henseler, Ringle, and Sarstedt (2015) HTMT article.
-
-
-## v0.1.7
-- Prepared source repository for public release: aligned version metadata and added `.gitignore` for build artifacts.
+### v0.1.5
+- Fixed jamovi 2.4.x result-table population by using `addRow()` after `deleteRows()`.
