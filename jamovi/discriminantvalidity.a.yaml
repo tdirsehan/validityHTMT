@@ -1,11 +1,11 @@
 ---
 name: discriminantValidity
-title: Discriminant Validity (HTMT)
+title: Discriminant Validity (HTMT+)
 menuGroup: Factor
 menuSubgroup: Validity
-menuTitle: Discriminant Validity (HTMT)
+menuTitle: Discriminant Validity (HTMT+)
 jas: '1.2'
-version: '0.2.0'
+version: '0.2.1'
 
 options:
   - name: data
@@ -112,7 +112,7 @@ options:
     default: pairwise
 
   - name: threshold
-    title: HTMT threshold
+    title: HTMT+ threshold
     type: List
     options:
       - title: '0.85 (strict)'
