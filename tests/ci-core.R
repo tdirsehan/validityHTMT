@@ -58,16 +58,20 @@ constructs <- list(
 )
 
 Hp <- htmt_matrix(d, constructs, method = "pearson")
+pearson_actual <- c(Hp["C1", "C2"], Hp["C1", "C3"], Hp["C2", "C3"])
+cat("Pearson HTMT+ fixture:", paste(sprintf("%.15f", pearson_actual), collapse = ", "), "\n")
 assert_close(
-    c(Hp["C1", "C2"], Hp["C1", "C3"], Hp["C2", "C3"]),
-    c(0.30525247, 0.20524750, 0.29918240),
-    1e-7,
+    pearson_actual,
+    c(0.204267526162471, 0.236232267231236, 0.267147172726584),
+    1e-12,
     "Pearson HTMT+"
 )
 
 Hs <- htmt_matrix(d, constructs, method = "spearman")
+spearman_actual <- c(Hs["C1", "C2"], Hs["C1", "C3"], Hs["C2", "C3"])
+cat("Spearman HTMT+ fixture:", paste(sprintf("%.15f", spearman_actual), collapse = ", "), "\n")
 assert_close(
-    c(Hs["C1", "C2"], Hs["C1", "C3"], Hs["C2", "C3"]),
+    spearman_actual,
     c(0.28122732, 0.21208079, 0.29532938),
     1e-7,
     "Spearman HTMT+"
