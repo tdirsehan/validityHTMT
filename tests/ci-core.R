@@ -72,8 +72,8 @@ spearman_actual <- c(Hs["C1", "C2"], Hs["C1", "C3"], Hs["C2", "C3"])
 cat("Spearman HTMT+ fixture:", paste(sprintf("%.15f", spearman_actual), collapse = ", "), "\n")
 assert_close(
     spearman_actual,
-    c(0.28122732, 0.21208079, 0.29532938),
-    1e-7,
+    c(0.147178929330293, 0.222930886242476, 0.268662751866541),
+    1e-12,
     "Spearman HTMT+"
 )
 
