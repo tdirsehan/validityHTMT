@@ -1,14 +1,17 @@
 Package: validityHTMT
 Type: Package
-Title: Discriminant Validity with HTMT for jamovi
-Version: 0.2.0
+Title: Discriminant Validity with HTMT+ for jamovi
+Version: 0.2.1
 Author: Taskin Dirsehan [aut, cre]
 Maintainer: Taskin Dirsehan <taskindirsehan@gmail.com>
-Description: Computes the Heterotrait-Monotrait ratio of correlations (HTMT)
-    for assessing discriminant validity in multi-item measurement models.
+Description: Computes the Heterotrait-Monotrait ratio of correlations using
+    absolute indicator correlations (HTMT+) for assessing discriminant validity
+    in multi-item reflective measurement models.
 License: GPL-2
 Encoding: UTF-8
 LazyData: true
+URL: https://github.com/tdirsehan/validityHTMT
+BugReports: https://github.com/tdirsehan/validityHTMT/issues
 Imports:
     jmvcore (>= 0.8.5),
     R6
