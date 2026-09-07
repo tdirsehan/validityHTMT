@@ -1,4 +1,4 @@
-name: R core tests
+name: R core and jamovi schema tests
 
 on:
   push:
@@ -11,11 +11,11 @@ permissions:
   contents: read
 
 concurrency:
-  group: r-core-tests-${{ github.ref }}
+  group: validityhtmt-tests-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
+  numerical-core:
     runs-on: ubuntu-latest
 
     steps:
@@ -40,3 +40,37 @@ jobs:
 
       - name: Run independent HTMT+ verification
         run: Rscript tests/ci-core.R
+
+  jamovi-schema:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install system dependency for jmvtools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libuv1-dev
+
+      - name: Install jmvtools
+        shell: Rscript {0}
+        run: |
+          options(timeout = 600)
+          install.packages(
+            "jmvtools",
+            repos = c(
+              "https://repo.jamovi.org",
+              "https://cloud.r-project.org"
+            )
+          )
+
+      - name: Compile jamovi YAML definitions
+        shell: Rscript {0}
+        run: |
+          jmvtools::prepare()
