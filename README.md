@@ -26,6 +26,23 @@ HTMT+(A,B) = mean(|r_ij|, i in A, j in B) / sqrt(mean(|r_ij|, i != j in A) * mea
 
 This module deliberately uses absolute indicator correlations. This variant is commonly called **HTMT+**. It differs from the signed-correlation equation originally presented by Henseler, Ringle, and Sarstedt (2015) and avoids cancellation when positive and negative indicator correlations occur.
 
+## Published numerical cross-validation
+
+The automated tests reproduce the empirical benchmark in Henseler, Ringle, and Sarstedt (2015). The item correlation matrix from their Table 5 is supplied directly to the shared HTMT+ core. Because all correlations in that example are positive, HTMT+ and the original HTMT equation coincide for this benchmark.
+
+The implementation reproduces the Table 6 values after rounding:
+
+| Pair | Published HTMT | Calculated from Table 5 |
+| --- | ---: | ---: |
+| ACSI-CUEX | 0.63 | 0.6321122622 |
+| ACSI-PERQ | 0.95 | 0.9516421637 |
+| ACSI-PERV | 0.87 | 0.8744716501 |
+| CUEX-PERQ | 0.73 | 0.7334197129 |
+| CUEX-PERV | 0.53 | 0.5326063042 |
+| PERQ-PERV | 0.76 | 0.7607990244 |
+
+This published benchmark is complemented by synthetic Pearson/Spearman regression tests and edge-case tests.
+
 ## Example data and usage
 
 A fully synthetic dataset is provided at `examples/htmt_example.csv`.
@@ -83,7 +100,8 @@ jmvtools::install()
 
 The core test suite covers:
 
-- exact Pearson HTMT+ benchmark values;
+- the published Henseler et al. (2015) Table 5/Table 6 benchmark;
+- exact Pearson HTMT+ benchmark values on the bundled synthetic dataset;
 - exact Spearman HTMT+ benchmark values;
 - invariance to indicator sign reversal;
 - insufficient complete cases;
@@ -103,7 +121,7 @@ testthat::test_dir('tests/testthat')
 
 This is a community/experimental release candidate.
 
-The v0.2.1 review branch removes the experimental custom JavaScript/DOM construct controls used in v0.2.0 and relies only on native jamovi UI components. The statistical backend remains available for up to 8 constructs.
+The v0.2.1 review branch removes the experimental custom JavaScript/DOM construct controls used in v0.2.0 and relies only on native jamovi UI components. The statistical backend remains available for up to 8 constructs and now routes through the same shared HTMT+ core exercised by the regression tests.
 
 Known limitations:
 
@@ -113,9 +131,9 @@ Known limitations:
 
 ## References
 
-Henseler, J., Ringle, C. M., & Sarstedt, M. (2015). A new criterion for assessing discriminant validity in variance-based structural equation modeling. *Journal of the Academy of Marketing Science*, *43*(1), 115-135.
+Henseler, J., Ringle, C. M., & Sarstedt, M. (2015). A new criterion for assessing discriminant validity in variance-based structural equation modeling. *Journal of the Academy of Marketing Science*, *43*(1), 115-135. https://doi.org/10.1007/s11747-014-0403-8
 
-Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspective on using partial least squares structural equation modelling in data articles. *Data in Brief*, *48*, 109074.
+Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspective on using partial least squares structural equation modelling in data articles. *Data in Brief*, *48*, 109074. https://doi.org/10.1016/j.dib.2023.109074
 
 ## Version notes
 
@@ -145,5 +163,6 @@ Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspec
 - Replaced `as.numeric()` with `jmvcore::toNumeric()` for jamovi-safe numeric conversion.
 - Added complete-case guards and correlation error handling.
 - Preserved non-estimable-correlation warnings instead of overwriting them.
-- Added exact-value Pearson and Spearman regression tests and edge-case tests.
+- Added published and synthetic exact-value regression tests plus edge-case tests.
+- Routed the jamovi backend through the same tested HTMT+ core.
 - Removed custom JavaScript/DOM UI manipulation from the review build.
