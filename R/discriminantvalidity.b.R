@@ -35,42 +35,6 @@ discriminantValidityClass <- R6::R6Class(
             )
         },
 
-        .meanWithin = function(R, vars) {
-            if (length(vars) < 2)
-                return(NA_real_)
-
-            block <- abs(R[vars, vars, drop = FALSE])
-            values <- block[upper.tri(block)]
-            values <- values[is.finite(values)]
-
-            if (length(values) == 0)
-                return(NA_real_)
-
-            mean(values)
-        },
-
-        .htmtPlus = function(R, a, b) {
-            if (length(a) < 2 || length(b) < 2)
-                return(NA_real_)
-
-            cross <- abs(R[a, b, drop = FALSE])
-            crossValues <- as.numeric(cross)
-            crossValues <- crossValues[is.finite(crossValues)]
-
-            if (length(crossValues) == 0)
-                return(NA_real_)
-
-            hetero <- mean(crossValues)
-            monoA <- private$.meanWithin(R, a)
-            monoB <- private$.meanWithin(R, b)
-
-            denom <- sqrt(monoA * monoB)
-            if (!is.finite(hetero) || !is.finite(denom) || denom <= 0)
-                return(NA_real_)
-
-            hetero / denom
-        },
-
         .run = function() {
             self$results$references$setContent(
                 paste0(
@@ -196,26 +160,12 @@ discriminantValidityClass <- R6::R6Class(
                 )
             }
 
+            # Use the same shared HTMT+ core that is covered by the numerical
+            # regression tests, avoiding a second independent formula copy.
+            namedSets <- sets
+            names(namedSets) <- constructNames
+            M <- htmt_from_correlation(R, namedSets)
             k <- length(sets)
-            M <- matrix(
-                NA_real_,
-                nrow = k,
-                ncol = k,
-                dimnames = list(constructNames, constructNames)
-            )
-            diag(M) <- 1
-
-            for (i in seq_len(k - 1)) {
-                for (j in (i + 1):k) {
-                    value <- private$.htmtPlus(
-                        R,
-                        sets[[i]],
-                        sets[[j]]
-                    )
-                    M[i, j] <- value
-                    M[j, i] <- value
-                }
-            }
 
             # Eight columns are predeclared for compatibility with older jamovi
             # compilers, including jamovi 2.4.x.
