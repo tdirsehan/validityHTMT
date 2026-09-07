@@ -1,15 +1,15 @@
 ---
 name: discriminantValidity
-title: Discriminant Validity (HTMT)
+title: Discriminant Validity (HTMT+)
 jrs: '1.1'
 
 items:
   - name: instructions
-    title: Discriminant Validity (HTMT)
+    title: Discriminant Validity (HTMT+)
     type: Html
 
   - name: htmtMatrix
-    title: HTMT Matrix
+    title: HTMT+ Matrix
     type: Table
     columns:
       - name: construct
@@ -49,7 +49,7 @@ items:
         format: zto
 
   - name: pairTable
-    title: Pairwise Assessment
+    title: Pairwise HTMT+ Assessment
     type: Table
     visible: (showPairs)
     columns:
@@ -60,7 +60,7 @@ items:
         title: Construct B
         type: text
       - name: htmt
-        title: HTMT
+        title: HTMT+
         type: number
         format: zto
       - name: threshold
