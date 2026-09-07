@@ -1,4 +1,4 @@
-source(file.path("R", "htmt-core.R"))
+source(testthat::test_path("..", "..", "R", "htmt-core.R"))
 
 testthat::test_that("HTMT+ reproduces the published Henseler et al. (2015) benchmark", {
     # Item correlation matrix from Henseler, Ringle, and Sarstedt (2015),
@@ -71,7 +71,7 @@ example_constructs <- list(
 
 testthat::test_that("HTMT+ reproduces the fixed Pearson benchmark", {
     d <- utils::read.csv(
-        file.path("examples", "htmt_example.csv"),
+        testthat::test_path("..", "..", "examples", "htmt_example.csv"),
         check.names = FALSE
     )
 
@@ -100,7 +100,7 @@ testthat::test_that("HTMT+ reproduces the fixed Pearson benchmark", {
 
 testthat::test_that("HTMT+ reproduces the fixed Spearman benchmark", {
     d <- utils::read.csv(
-        file.path("examples", "htmt_example.csv"),
+        testthat::test_path("..", "..", "examples", "htmt_example.csv"),
         check.names = FALSE
     )
 
