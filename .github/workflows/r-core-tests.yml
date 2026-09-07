@@ -10,6 +10,10 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: r-core-tests-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -23,23 +27,16 @@ jobs:
         with:
           use-public-rspm: true
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y libuv1-dev
-
-      - name: Install test dependencies
+      - name: Install jamovi core dependency
         shell: Rscript {0}
         run: |
           install.packages(
-            c("testthat", "jmvcore"),
+            "jmvcore",
             repos = c(
               "https://repo.jamovi.org",
               "https://cloud.r-project.org"
             )
           )
 
-      - name: Run HTMT+ core tests
-        shell: Rscript {0}
-        run: |
-          testthat::test_dir("tests/testthat", reporter = "summary")
+      - name: Run independent HTMT+ verification
+        run: Rscript tests/ci-core.R
