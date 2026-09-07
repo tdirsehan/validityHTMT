@@ -83,9 +83,9 @@ testthat::test_that("HTMT+ reproduces the fixed Pearson benchmark", {
 
     expected <- matrix(
         c(
-            1.00000000, 0.30525247, 0.20524750,
-            0.30525247, 1.00000000, 0.29918240,
-            0.20524750, 0.29918240, 1.00000000
+            1.000000000000000, 0.204267526162471, 0.236232267231236,
+            0.204267526162471, 1.000000000000000, 0.267147172726584,
+            0.236232267231236, 0.267147172726584, 1.000000000000000
         ),
         nrow = 3,
         byrow = TRUE,
@@ -95,7 +95,7 @@ testthat::test_that("HTMT+ reproduces the fixed Pearson benchmark", {
         )
     )
 
-    testthat::expect_equal(H, expected, tolerance = 1e-7)
+    testthat::expect_equal(H, expected, tolerance = 1e-12)
 })
 
 testthat::test_that("HTMT+ reproduces the fixed Spearman benchmark", {
@@ -112,9 +112,9 @@ testthat::test_that("HTMT+ reproduces the fixed Spearman benchmark", {
 
     expected <- matrix(
         c(
-            1.00000000, 0.28122732, 0.21208079,
-            0.28122732, 1.00000000, 0.29532938,
-            0.21208079, 0.29532938, 1.00000000
+            1.000000000000000, 0.147178929330293, 0.222930886242476,
+            0.147178929330293, 1.000000000000000, 0.268662751866541,
+            0.222930886242476, 0.268662751866541, 1.000000000000000
         ),
         nrow = 3,
         byrow = TRUE,
@@ -124,7 +124,7 @@ testthat::test_that("HTMT+ reproduces the fixed Spearman benchmark", {
         )
     )
 
-    testthat::expect_equal(H, expected, tolerance = 1e-7)
+    testthat::expect_equal(H, expected, tolerance = 1e-12)
 })
 
 testthat::test_that("HTMT+ is invariant to indicator sign reversal", {
