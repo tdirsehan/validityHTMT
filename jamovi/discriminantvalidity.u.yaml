@@ -1,11 +1,7 @@
 ---
 name: discriminantValidity
-title: Discriminant Validity (HTMT)
+title: Discriminant Validity (HTMT+)
 jus: '3.0'
-compilerMode: tame
-events:
-  loaded: view_loaded
-  updated: view_updated
 children:
   - type: VariableSupplier
     name: variablesupplier
@@ -77,9 +73,6 @@ children:
           - type: VariablesListBox
             name: c8
             isTarget: true
-
-  - type: CustomControl
-    name: uiControls
 
   - type: CollapseBox
     label: Construct names
