@@ -18,7 +18,7 @@ async def main():
     opened=messages[-1]
     assert opened['status']=='OK', opened
     instance=opened['url'].strip('/')
-    ws=await websocket_connect(HTTPRequest(BASE.replace('http','ws')+'/'+instance+'/coms',headers={'Cookie':COOKIE}),connect_timeout=30)
+    ws=await websocket_connect(HTTPRequest(BASE.replace('http','ws')+'/'+instance+'/coms',headers={'Cookie':COOKIE},connect_timeout=30))
     next_id=0
     async def send(request):
         nonlocal next_id
