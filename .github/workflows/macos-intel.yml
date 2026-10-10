@@ -1,0 +1,48 @@
+name: macOS Intel jamovi 2.4.8 validation
+on:
+  push:
+    branches: [verify/macos-intel-248]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  macos-test:
+    runs-on: macos-15-intel
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Download official jamovi 2.4.8 Intel distribution
+        run: |
+          mkdir -p artifacts
+          uname -m | tee artifacts/architecture.txt
+          test "$(uname -m)" = x86_64
+          curl --fail --location --retry 2 --max-time 180 \
+            https://www.jamovi.org/downloads/jamovi-2.4.8.0-macos.dmg -o /tmp/jamovi.dmg || \
+          curl --fail --location --retry 2 --max-time 180 \
+            https://dl.jamovi.org/jamovi-2.4.8.0-macos.dmg -o /tmp/jamovi.dmg
+          hdiutil attach /tmp/jamovi.dmg -mountpoint /Volumes/jamovi-test -nobrowse
+          cp -R /Volumes/jamovi-test/jamovi.app /Applications/jamovi.app
+          hdiutil detach /Volumes/jamovi-test
+          /Applications/jamovi.app/Contents/MacOS/jamovi --version | tee artifacts/jamovi-version.txt
+          grep -q '2.4.8' artifacts/jamovi-version.txt
+      - name: Inspect bundled runtime
+        run: |
+          find /Applications/jamovi.app/Contents -maxdepth 5 \( -name 'python*' -o -name 'env.conf' -o -name 'R' -o -name 'server' \) | tee artifacts/runtime-paths.txt
+          cat /Applications/jamovi.app/Contents/Resources/env.conf | tee artifacts/env-layout.txt
+      - name: Build the Mac Intel module
+        run: |
+          git clone https://github.com/jamovi/jamovi-compiler.git /tmp/jamovi-compiler
+          git -C /tmp/jamovi-compiler checkout 0f554f58fd32bb5fd817306ba139d0f6edd9e697
+          npm ci --ignore-scripts --prefix /tmp/jamovi-compiler
+          node /tmp/jamovi-compiler/index.js --build . --home /Applications/jamovi.app --skip-deps --jmo artifacts/validityHTMT_0.2.1_macos_intel_jamovi2.4.8.jmo
+          test -s artifacts/validityHTMT_0.2.1_macos_intel_jamovi2.4.8.jmo
+      - name: Upload Mac package and evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validityHTMT-macos-intel-jamovi2.4.8
+          path: artifacts/
+          if-no-files-found: error
