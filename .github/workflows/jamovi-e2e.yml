@@ -1,0 +1,67 @@
+name: jamovi package and application E2E
+on:
+  push:
+    branches: [verify/jamovi-e2e-20261010]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  application-test:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare compiler and browser
+        run: |
+          mkdir -p artifacts
+          git clone https://github.com/jamovi/jamovi-compiler.git /tmp/jamovi-compiler
+          git -C /tmp/jamovi-compiler checkout 0f554f58fd32bb5fd817306ba139d0f6edd9e697
+          npm ci --ignore-scripts --prefix /tmp/jamovi-compiler
+          npm install --no-save --ignore-scripts playwright@1.51.1
+          npx playwright install --with-deps chromium
+      - name: Start official jamovi runtime
+        run: |
+          docker run -d --name jamovi-e2e --network host \
+            -v "$GITHUB_WORKSPACE:/work" \
+            -v /tmp/jamovi-compiler:/compiler:ro \
+            -v "$(dirname "$(command -v node)"):/node:ro" \
+            -e JAMOVI_HOST_A=127.0.0.1:41337 \
+            -e JAMOVI_HOST_B=127.0.0.1:41338 \
+            -e JAMOVI_HOST_C=127.0.0.1:41339 \
+            -e JAMOVI_ACCESS_KEY=validityhtmt-ci-local-only \
+            -e JAMOVI_SESSION_EXPIRES=0 \
+            --entrypoint /bin/bash jamovi/jamovi:2.3.13 -c 'tail -f /dev/null'
+      - name: Build and install the real jmo package
+        run: |
+          docker exec -w /work jamovi-e2e /node/node /compiler/index.js \
+            --build /work --home /usr/lib/jamovi --rhome /usr/local/lib/R \
+            --rlibs /usr/local/lib/R/library --skip-deps \
+            --jmo /work/artifacts/validityHTMT_0.2.1_linux_R4.1.2.jmo
+          test -s artifacts/validityHTMT_0.2.1_linux_R4.1.2.jmo
+          docker exec -w /work jamovi-e2e python3 tests/e2e/install.py
+      - name: Start jamovi application server
+        run: |
+          docker exec -d -w /work jamovi-e2e /bin/bash -c 'python3 -m jamovi.server 41337 > /work/artifacts/server.log 2>&1'
+          for i in $(seq 1 60); do
+            if curl -fsS http://127.0.0.1:41337/version; then exit 0; fi
+            sleep 1
+          done
+          cat artifacts/server.log
+          exit 1
+      - name: Run analyses through the actual jamovi engine
+        run: docker exec -w /work jamovi-e2e python3 tests/e2e/engine.py
+      - name: Verify rendered results in Chromium
+        run: node tests/e2e/browser.cjs
+      - name: Upload package and test evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: validityHTMT-linux-application-test
+          path: artifacts/
+          if-no-files-found: error
+      - name: Stop test runtime
+        if: always()
+        run: docker rm -f jamovi-e2e || true
