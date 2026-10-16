@@ -1,0 +1,68 @@
+name: Build jamovi JMO (macOS)
+
+on:
+  push:
+    branches:
+      - fix/jamovi-audit-v1
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  jmo-macos:
+    runs-on: macos-15
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install jamovi application
+        run: |
+          brew install --cask jamovi
+          test -d /Applications/jamovi.app
+
+      - name: Install R tooling
+        uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - name: Install module tools
+        shell: Rscript {0}
+        run: |
+          options(timeout = 600)
+          install.packages(c("jmvtools", "testthat"),
+            repos = c("https://repo.jamovi.org", "https://cloud.r-project.org"))
+
+      - name: Run numerical regression suite
+        run: |
+          Rscript tests/ci-core.R
+
+      - name: Start jamovi
+        run: |
+          open -a jamovi
+          sleep 12
+
+      - name: Build and install JMO
+        shell: Rscript {0}
+        run: |
+          options(jamovi_home = "/Applications/jamovi.app/Contents")
+          jmvtools::check()
+          jmvtools::prepare()
+          jmvtools::install()
+
+      - name: Verify actual JMO archive
+        run: |
+          set -euo pipefail
+          find . -maxdepth 2 -type f -name '*.jmo' -print
+          count=$(find . -maxdepth 2 -type f -name '*.jmo' | wc -l | tr -d ' ')
+          test "$count" -ge 1
+          mkdir -p dist
+          find . -maxdepth 2 -type f -name '*.jmo' -exec cp {} dist/ \;
+          ls -lh dist/*.jmo
+
+      - name: Upload platform-specific JMO
+        uses: actions/upload-artifact@v4
+        with:
+          name: validityHTMT-1.0.0-macos-jmo
+          path: dist/*.jmo
+          if-no-files-found: error
