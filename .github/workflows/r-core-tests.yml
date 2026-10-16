@@ -77,11 +77,23 @@ jobs:
           install.packages("yaml", repos = "https://cloud.r-project.org")
           source("tests/audit-schema.R")
 
+      - name: Parse all R source code
+        shell: Rscript {0}
+        run: |
+          paths <- c(list.files("R", pattern = "\\.R$", full.names = TRUE),
+                     list.files("tests", pattern = "\\.R$", full.names = TRUE))
+          invisible(lapply(paths, parse))
+          cat("R syntax parse completed for ", length(paths), " files.\\n")
+
       - name: Try jamovi compilation (requires running jamovi service)
         shell: Rscript {0}
         run: |
-          jmvtools::prepare()
+          result <- capture.output(jmvtools::prepare(), type = "output")
+          cat(paste(result, collapse = "\\n"), "\\n")
+          if (any(grepl("jamovi did not respond", result, ignore.case = TRUE))) {
+            stop("jamovi compiler is unavailable: jamovi did not respond")
+          }
           if (!file.exists("R/discriminantvalidity.h.R") &&
               !file.exists("R/discriminantvalidity.src.R")) {
-            stop("jamovi compiler did not generate expected output; a working jamovi service is required.")
+            stop("No expected jamovi-generated code was found; verify the compiler installation.")
           }
