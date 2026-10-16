@@ -1,10 +1,11 @@
-name: R core and jamovi schema tests
+name: R core and static jamovi schema tests
 
 on:
   push:
     branches:
       - review-ready-v0.2.1
       - main
+      - fix/jamovi-audit-v1
   pull_request:
 
 permissions:
@@ -70,7 +71,17 @@ jobs:
             )
           )
 
-      - name: Compile jamovi YAML definitions
+      - name: Validate YAML structure and option wiring
         shell: Rscript {0}
         run: |
-          jmvtools::prepare()
+          install.packages("yaml", repos = "https://cloud.r-project.org")
+          source("tests/audit-schema.R")
+
+      - name: Parse all R source code
+        shell: Rscript {0}
+        run: |
+          paths <- c(list.files("R", pattern = "\\.R$", full.names = TRUE),
+                     list.files("tests", pattern = "\\.R$", full.names = TRUE))
+          invisible(lapply(paths, parse))
+          cat("R syntax parse completed for ", length(paths), " files.\\n")
+

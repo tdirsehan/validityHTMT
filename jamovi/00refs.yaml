@@ -1,0 +1,17 @@
+---
+refs:
+  henseler2015:
+    type: article
+    author: Henseler, J., Ringle, C. M., & Sarstedt, M.
+    year: 2015
+    title: A new criterion for assessing discriminant validity in variance-based structural equation modeling
+    publisher: Journal of the Academy of Marketing Science, 43(1), 115–135
+    url: https://doi.org/10.1007/s11747-014-0403-8
+  ringle2023:
+    type: article
+    author: Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R.
+    year: 2023
+    title: A perspective on using partial least squares structural equation modelling in data articles
+    publisher: Data in Brief, 48, 109074
+    url: https://doi.org/10.1016/j.dib.2023.109074
+...
