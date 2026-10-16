@@ -1,4 +1,4 @@
-name: R core and jamovi schema tests
+name: R core and static jamovi schema tests
 
 on:
   push:
@@ -85,15 +85,3 @@ jobs:
           invisible(lapply(paths, parse))
           cat("R syntax parse completed for ", length(paths), " files.\\n")
 
-      - name: Try jamovi compilation (requires running jamovi service)
-        shell: Rscript {0}
-        run: |
-          result <- capture.output(jmvtools::prepare(), type = "output")
-          cat(paste(result, collapse = "\\n"), "\\n")
-          if (any(grepl("jamovi did not respond", result, ignore.case = TRUE))) {
-            stop("jamovi compiler is unavailable: jamovi did not respond")
-          }
-          if (!file.exists("R/discriminantvalidity.h.R") &&
-              !file.exists("R/discriminantvalidity.src.R")) {
-            stop("No expected jamovi-generated code was found; verify the compiler installation.")
-          }
