@@ -6,7 +6,6 @@ menuSubgroup: Validity
 menuTitle: Discriminant Validity (HTMT+)
 jas: '1.2'
 version: '1.0.0'
-refs: [henseler2015, ringle2023]
 
 options:
   - name: data
