@@ -23,7 +23,7 @@ discriminantValidityClass <- R6::R6Class(
             }, character(1))
             blank <- !nzchar(labels)
             labels[blank] <- paste0("Construct ", slotNumbers[blank])
-            list(sets = sets, names = make.unique(labels))
+            list(sets = sets, names = labels)
         },
 
         .init = function() {
@@ -79,6 +79,9 @@ discriminantValidityClass <- R6::R6Class(
             if (k < 2)
                 return()
 
+            if (anyDuplicated(constructNames))
+                jmvcore::reject("Construct names must be unique. Rename duplicate constructs.")
+
             if (any(vapply(sets, length, integer(1)) < 2))
                 jmvcore::reject("Each selected construct must contain at least two indicators.")
 
@@ -118,14 +121,19 @@ discriminantValidityClass <- R6::R6Class(
                     conditionMessage(R)
                 ))
 
+            if (!any(is.finite(R[upper.tri(R)])))
+                jmvcore::reject("No estimable indicator correlations remain. Check variability and missing values.")
+
             namedSets <- sets
             names(namedSets) <- constructNames
             M <- htmt_from_correlation(R, namedSets)
+            if (all(!is.finite(M[upper.tri(M)])))
+                jmvcore::reject("No HTMT+ construct pairs could be estimated. Check within-construct correlations.")
             tab <- self$results$htmtMatrix
             for (i in seq_len(k)) {
                 values <- list()
                 for (j in seq_len(k))
-                    values[[paste0("c", j)]] <- M[i, j]
+                    values[[paste0("c", j)]] <- if (i == j) NA_real_ else M[i, j]
                 tab$setRow(rowKey = i, values = values)
             }
 
