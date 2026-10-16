@@ -6,7 +6,7 @@ Developed by Prof. Dr. Taşkın Dirsehan.
 
 ## Current features
 
-- Up to 8 reflective constructs.
+- Dynamically add reflective constructs (no fixed eight-construct limit).
 - Native jamovi indicator-assignment controls only; no custom DOM/UI workaround is required.
 - User-defined construct names.
 - Pearson or Spearman correlations.
@@ -53,7 +53,7 @@ Suggested review workflow:
 2. Open `Factor` -> `Validity` -> `Discriminant Validity (HTMT+)`.
 3. Assign `C1_1` to `C1_4` to Construct 1.
 4. Assign `C2_1` to `C2_4` to Construct 2.
-5. Optionally assign `C3_1` to `C3_4` to Construct 3.
+5. Click `Add New Construct`, name it C3, and optionally assign `C3_1` to `C3_4`.
 6. Inspect the HTMT+ matrix and the optional pairwise interpretation table.
 7. Repeat with Pearson/Spearman, 0.85/0.90 thresholds, and pairwise/complete-case missing-data handling.
 
@@ -117,11 +117,11 @@ The lightweight GitHub Actions check runs `tests/ci-core.R` with `jmvcore`; the 
 testthat::test_dir('tests/testthat')
 ```
 
-## v0.2.1 status
+## v1.0.0 review status
 
-This is a community/experimental release candidate.
+This is a candidate undergoing jamovi library audit remediation. The native Array/ListBox user interface and full jamovi module execution require validation in a running jamovi application. A successful numerical R test alone is not a complete module acceptance test.
 
-The v0.2.1 review branch removes the experimental custom JavaScript/DOM construct controls used in v0.2.0 and relies only on native jamovi UI components. The statistical backend remains available for up to 8 constructs and now routes through the same shared HTMT+ core exercised by the regression tests.
+Important compatibility note: analyses saved with the fixed c1–c8 controls in v0.2.1 do not automatically migrate their variable assignments to the new `constructs` Array option. Reassign indicators when opening legacy analyses. No transparent migration is claimed.
 
 Known limitations:
 
@@ -167,3 +167,11 @@ Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspec
 - Routed the jamovi backend through the same tested HTMT+ core.
 - Removed custom JavaScript/DOM UI manipulation from the review build.
 - Corrected and locked the synthetic Pearson/Spearman fixtures against deterministic R/jmvcore CI output.
+
+### v1.0.0 (audit remediation candidate)
+- Replaced fixed construct slots with a native Array/ListBox builder.
+- Created dynamic HTMT+ matrix columns from construct labels.
+- Replaced HTML references with jamovi native references.
+- Added explicit validation for duplicate construct names and completely non-estimable HTMT+ results.
+- Left matrix diagonal blank because it does not represent between-construct HTMT+.
+- Expanded GitHub CI and retained clear separation between static checks and a running jamovi compiler.
