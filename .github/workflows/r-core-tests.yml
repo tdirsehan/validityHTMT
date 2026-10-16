@@ -5,6 +5,7 @@ on:
     branches:
       - review-ready-v0.2.1
       - main
+      - fix/jamovi-audit-v1
   pull_request:
 
 permissions:
@@ -70,7 +71,17 @@ jobs:
             )
           )
 
-      - name: Compile jamovi YAML definitions
+      - name: Validate YAML structure and option wiring
+        shell: Rscript {0}
+        run: |
+          install.packages("yaml", repos = "https://cloud.r-project.org")
+          source("tests/audit-schema.R")
+
+      - name: Try jamovi compilation (requires running jamovi service)
         shell: Rscript {0}
         run: |
           jmvtools::prepare()
+          if (!file.exists("R/discriminantvalidity.h.R") &&
+              !file.exists("R/discriminantvalidity.src.R")) {
+            stop("jamovi compiler did not generate expected output; a working jamovi service is required.")
+          }
