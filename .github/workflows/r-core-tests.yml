@@ -42,6 +42,12 @@ jobs:
       - name: Run independent HTMT+ verification
         run: Rscript tests/ci-core.R
 
+      - name: Run testthat regression suite
+        shell: Rscript {0}
+        run: |
+          install.packages('testthat', repos = 'https://cloud.r-project.org')
+          testthat::test_dir('tests/testthat')
+
   jamovi-schema:
     runs-on: ubuntu-latest
 
@@ -76,6 +82,9 @@ jobs:
         run: |
           install.packages("yaml", repos = "https://cloud.r-project.org")
           source("tests/audit-schema.R")
+
+      - name: Validate JavaScript event handler syntax
+        run: node --check jamovi/js/discriminantvalidity.events.js
 
       - name: Parse all R source code
         shell: Rscript {0}

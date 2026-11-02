@@ -2,6 +2,7 @@
 name: discriminantValidity
 title: Discriminant Validity (HTMT+)
 jus: '3.0'
+compilerMode: tame
 children:
   - type: VariableSupplier
     name: variablesupplier
@@ -17,6 +18,8 @@ children:
             name: constructs
             height: large
             addButton: Add New Construct
+            events:
+              listItemAdded: './discriminantvalidity.events::onConstructAdded'
             template:
               type: LayoutBox
               margin: normal

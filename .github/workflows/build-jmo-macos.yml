@@ -3,7 +3,8 @@ name: Build jamovi JMO (macOS)
 on:
   push:
     branches:
-      - fix/jamovi-audit-v1
+      - main
+  pull_request:
   workflow_dispatch:
 
 permissions:
@@ -63,6 +64,6 @@ jobs:
       - name: Upload platform-specific JMO
         uses: actions/upload-artifact@v4
         with:
-          name: validityHTMT-1.0.0-macos-jmo
+          name: validityHTMT-1.0.1-macos-jmo
           path: dist/*.jmo
           if-no-files-found: error
