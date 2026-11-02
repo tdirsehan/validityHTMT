@@ -82,4 +82,47 @@ stopifnot(any(grepl("Potential", as.character(unlist(strictTab)),
 # Optional interpretation table must not affect HTMT+ values.
 noPairs <- execute(showPairs = FALSE)
 stopifnot(nrow(noPairs$htmtMatrix$asDF) == 3L)
+# Verify complete-case handling through the generated analysis, not only the core.
+incomplete <- d
+incomplete$C1_1[1:5] <- NA_real_
+incomplete$C2_2[6:10] <- NA_real_
+completeResult <- execute(data = incomplete, method = "spearman",
+                          missing = "complete")
+completeExpected <- htmt_matrix(incomplete, namedGroups,
+    method = "spearman", use = "complete.obs")
+completeObserved <- as.matrix(sapply(completeResult$htmtMatrix$asDF[-1],
+                                     as.numeric))
+stopifnot(abs(completeObserved[1, 2] - completeExpected[1, 2]) < 1e-10,
+          abs(completeObserved[1, 3] - completeExpected[1, 3]) < 1e-10,
+          abs(completeObserved[2, 3] - completeExpected[2, 3]) < 1e-10)
+
+# Exercise the name fallback when a construct has a blank name.
+blank <- groups
+blank[[3]]$label <- ""
+blankResult <- execute(constructs = blank)
+stopifnot(identical(as.character(blankResult$htmtMatrix$asDF[[1]]),
+                    c("C1", "C2", "Construct 3")))
+
+# A constant indicator should generate a native warning, while still
+# allowing usable construct pairs to be reported (no fatal runtime error).
+set.seed(109)
+warningData <- data.frame(
+    A1 = stats::rnorm(60), A2 = stats::rnorm(60),
+    B1 = stats::rnorm(60), B2 = stats::rnorm(60),
+    C1 = rep(1, 60), C2 = stats::rnorm(60)
+)
+warningGroups <- list(
+    list(label = "A", vars = c("A1", "A2")),
+    list(label = "B", vars = c("B1", "B2")),
+    list(label = "C", vars = c("C1", "C2"))
+)
+warnResult <- execute(data = warningData, constructs = warningGroups)
+warnMatrix <- warnResult$htmtMatrix$asDF
+warnPairs <- warnResult$pairTable$asDF
+stopifnot(nrow(warnMatrix) == 3L, nrow(warnPairs) == 3L,
+          is.finite(as.numeric(warnMatrix[1, 3])),
+          is.na(as.numeric(warnMatrix[1, 4])),
+          any(grepl("Not estimable", unlist(warnPairs), fixed = TRUE)))
+cat("Non-finite correlation warning path completed without a fatal error.\n")
+
 cat("Packaged jamovi analysis integration checks passed.\n")
