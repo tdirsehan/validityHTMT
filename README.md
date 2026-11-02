@@ -117,7 +117,7 @@ The lightweight GitHub Actions check runs `tests/ci-core.R` with `jmvcore`; the 
 testthat::test_dir('tests/testthat')
 ```
 
-## v1.0.1 review status
+## v1.0.2 review status
 
 This is a candidate undergoing jamovi library audit remediation. The native Array/ListBox user interface and full jamovi module execution require validation in a running jamovi application. A successful numerical R test alone is not a complete module acceptance test.
 
@@ -183,3 +183,8 @@ Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspec
 - Share numeric conversion, observation checks, missing-data handling, and correlation computation between the analysis and standalone numerical tests.
 - Move threshold information out of the pairwise-table column into a single table note.
 - Expand regression, syntax and reference-wiring checks and run jamovi packaging in CI.
+
+### v1.0.2 (deeper integration audit)
+- Ensure computed matrix and interpretation notes persist when results are restored.
+- Test actual packaged analysis outputs, method and threshold behavior, and dynamic UI event labels in CI.
+- The native jamovi graphical interface still requires a final interactive acceptance check.
