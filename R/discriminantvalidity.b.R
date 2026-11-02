@@ -93,33 +93,19 @@ discriminantValidityClass <- R6::R6Class(
                     paste(duplicatedVars, collapse = ", ")
                 ))
 
-            dat <- self$data[, allVars, drop = FALSE]
-            dat <- as.data.frame(lapply(dat, jmvcore::toNumeric), check.names = FALSE)
-            names(dat) <- allVars
-            if (nrow(dat) < 2)
-                jmvcore::reject("At least two observations are required.")
-
             use <- if (identical(self$options$missing, "complete"))
                 "complete.obs" else "pairwise.complete.obs"
             method <- if (identical(self$options$correlation, "spearman"))
                 "spearman" else "pearson"
 
-            if (identical(use, "complete.obs") &&
-                sum(stats::complete.cases(dat)) < 2)
-                jmvcore::reject(paste0(
-                    "HTMT+ could not be estimated because fewer than two ",
-                    "complete observations remain."
-                ))
-
+            # Use the same conversion, missing-data handling and correlation
+            # routine as the independently tested htmt_matrix() API.
             R <- tryCatch(
-                suppressWarnings(stats::cor(dat, use = use, method = method)),
+                htmt_correlations(self$data, allVars, method = method, use = use),
                 error = function(e) e
             )
             if (inherits(R, "error"))
-                jmvcore::reject(paste0(
-                    "HTMT+ correlations could not be estimated: ",
-                    conditionMessage(R)
-                ))
+                jmvcore::reject(conditionMessage(R))
 
             if (!any(is.finite(R[upper.tri(R)])))
                 jmvcore::reject("No estimable indicator correlations remain. Check variability and missing values.")
@@ -155,13 +141,18 @@ discriminantValidityClass <- R6::R6Class(
                         rowKey = rowNo,
                         values = list(
                             htmt = h,
-                            threshold = cut,
                             assessment = assessment
                         )
                     )
                     rowNo <- rowNo + 1L
                 }
             }
+
+            pairTab$setNote("threshold", paste0(
+                "Discriminant validity is supported when HTMT+ < ",
+                sprintf("%.2f", cut),
+                ". The threshold is a diagnostic, not a mechanical proof."
+            ))
 
             methodLabel <- if (method == "pearson") "Pearson" else "Spearman"
             missingLabel <- if (use == "complete.obs")

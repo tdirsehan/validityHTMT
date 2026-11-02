@@ -77,6 +77,23 @@ assert_close(
     "Spearman HTMT+"
 )
 
+
+# The same correlation helper is called by htmt_matrix() and jamovi .run().
+vars <- unlist(constructs, use.names = FALSE)
+R_pearson <- htmt_correlations(d, vars, method = "pearson")
+R_spearman <- htmt_correlations(d, vars, method = "spearman")
+assert_close(as.vector(R_pearson),
+    as.vector(stats::cor(d[, vars, drop = FALSE], method = "pearson", use = "pairwise.complete.obs")),
+    1e-12, "shared Pearson correlations")
+assert_close(as.vector(R_spearman),
+    as.vector(stats::cor(d[, vars, drop = FALSE], method = "spearman", use = "pairwise.complete.obs")),
+    1e-12, "shared Spearman correlations")
+assert_close(
+    c(htmt_from_correlation(R_pearson, constructs)["C1", "C2"],
+      htmt_from_correlation(R_pearson, constructs)["C1", "C3"],
+      htmt_from_correlation(R_pearson, constructs)["C2", "C3"]),
+    pearson_actual, 1e-12, "shared backend HTMT+ route")
+
 # HTMT+ must be invariant to indicator sign reversal.
 sign_data <- data.frame(
     x1 = c(1,2,4,5,7,9,10,12),

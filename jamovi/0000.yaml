@@ -1,7 +1,7 @@
 ---
 name: validityHTMT
 title: Validity HTMT+
-version: 1.0.0
+version: 1.0.1
 jms: '1.0'
 authors:
   - Taskin Dirsehan

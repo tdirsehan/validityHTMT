@@ -101,6 +101,51 @@ htmt_from_correlation <- function(R, constructs) {
 }
 
 
+# Shared data preparation and correlation estimation for the jamovi backend
+# and standalone HTMT+ API. Do not duplicate this step in .run().
+htmt_correlations <- function(data,
+                              vars,
+                              method = c("pearson", "spearman"),
+                              use = c("pairwise.complete.obs", "complete.obs")) {
+
+    method <- match.arg(method)
+    use <- match.arg(use)
+
+    missingVars <- setdiff(vars, names(data))
+    if (length(missingVars) > 0)
+        stop(paste0(
+            "Unknown indicator(s): ",
+            paste(missingVars, collapse = ", ")
+        ), call. = FALSE)
+
+    # jmvcore::toNumeric() preserves jamovi's ordinal/integer interpretation.
+    x <- as.data.frame(
+        lapply(data[, vars, drop = FALSE], jmvcore::toNumeric),
+        check.names = FALSE
+    )
+    names(x) <- vars
+
+    if (nrow(x) < 2)
+        stop("At least two observations are required.", call. = FALSE)
+
+    if (identical(use, "complete.obs") && sum(stats::complete.cases(x)) < 2)
+        stop("At least two complete observations are required for complete-case HTMT+.",
+             call. = FALSE)
+
+    result <- tryCatch(
+        suppressWarnings(stats::cor(x, use = use, method = method)),
+        error = function(e) e
+    )
+    if (inherits(result, "error"))
+        stop(paste0(
+            "HTMT+ correlations could not be estimated: ",
+            conditionMessage(result)
+        ), call. = FALSE)
+
+    result
+}
+
+
 htmt_matrix <- function(data,
                         constructs,
                         method = c("pearson", "spearman"),
@@ -120,41 +165,6 @@ htmt_matrix <- function(data,
     if (any(lengths(constructs) < 2))
         stop("Each construct requires at least two indicators.")
 
-    missingVars <- setdiff(vars, names(data))
-    if (length(missingVars) > 0)
-        stop(
-            paste0(
-                "Unknown indicator(s): ",
-                paste(missingVars, collapse = ", ")
-            )
-        )
-
-    # jamovi may expose ordinal/integer variables as factors with underlying
-    # numeric values. toNumeric() is the recommended conversion.
-    x <- as.data.frame(
-        lapply(data[, vars, drop = FALSE], jmvcore::toNumeric),
-        check.names = FALSE
-    )
-    names(x) <- vars
-
-    if (nrow(x) < 2)
-        stop("At least two observations are required.")
-
-    if (identical(use, "complete.obs") && sum(stats::complete.cases(x)) < 2)
-        stop("At least two complete observations are required for complete-case HTMT+.")
-
-    R <- tryCatch(
-        suppressWarnings(stats::cor(x, use = use, method = method)),
-        error = function(e) e
-    )
-
-    if (inherits(R, "error"))
-        stop(
-            paste0(
-                "HTMT+ correlations could not be estimated: ",
-                conditionMessage(R)
-            )
-        )
-
+    R <- htmt_correlations(data, vars, method = method, use = use)
     htmt_from_correlation(R, constructs)
 }

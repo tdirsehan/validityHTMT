@@ -11,6 +11,7 @@ items:
   - name: htmtMatrix
     title: HTMT+ Matrix
     type: Table
+    refs: [henseler2015, ringle2023]
     clearWith:
       - constructs
       - correlation
@@ -33,10 +34,6 @@ items:
         type: text
       - name: htmt
         title: HTMT+
-        type: number
-        format: zto
-      - name: threshold
-        title: Threshold
         type: number
         format: zto
       - name: assessment

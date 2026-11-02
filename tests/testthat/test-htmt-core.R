@@ -253,3 +253,29 @@ testthat::test_that("invalid construct specifications fail clearly", {
         "Unknown indicator"
     )
 })
+
+
+testthat::test_that("shared correlation helper preserves methods and missing-data choices", {
+    d <- data.frame(
+        "a 1" = c(1, 2, 3, 4, NA, 6),
+        "a-2" = c(2, 4, 1, 5, 7, 8),
+        "b 1" = c(8, 7, 6, NA, 3, 2),
+        "b-2" = c(7, 6, 5, 4, 3, 1),
+        check.names = FALSE
+    )
+    vars <- names(d)
+    for (method in c("pearson", "spearman")) {
+        for (use in c("pairwise.complete.obs", "complete.obs")) {
+            expected <- suppressWarnings(stats::cor(d, method = method, use = use))
+            actual <- htmt_correlations(d, vars, method = method, use = use)
+            testthat::expect_equal(actual, expected, tolerance = 1e-12)
+            constructs <- list(A = vars[1:2], B = vars[3:4])
+            testthat::expect_equal(
+                htmt_matrix(d, constructs, method = method, use = use),
+                htmt_from_correlation(actual, constructs),
+                tolerance = 1e-12
+            )
+        }
+    }
+})
+

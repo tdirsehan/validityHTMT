@@ -117,7 +117,7 @@ The lightweight GitHub Actions check runs `tests/ci-core.R` with `jmvcore`; the 
 testthat::test_dir('tests/testthat')
 ```
 
-## v1.0.0 review status
+## v1.0.1 review status
 
 This is a candidate undergoing jamovi library audit remediation. The native Array/ListBox user interface and full jamovi module execution require validation in a running jamovi application. A successful numerical R test alone is not a complete module acceptance test.
 
@@ -175,3 +175,11 @@ Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspec
 - Added explicit validation for duplicate construct names and completely non-estimable HTMT+ results.
 - Left matrix diagonal blank because it does not represent between-construct HTMT+.
 - Expanded GitHub CI and retained clear separation between static checks and a running jamovi compiler.
+
+
+### v1.0.1 (follow-up audit remediation)
+- Attach both Henseler et al. (2015) and Ringle et al. (2023) citations to the HTMT+ matrix with native result-level references.
+- Auto-name newly added constructs in the jamovi list panel, matching the existing R fallback.
+- Share numeric conversion, observation checks, missing-data handling, and correlation computation between the analysis and standalone numerical tests.
+- Move threshold information out of the pairwise-table column into a single table note.
+- Expand regression, syntax and reference-wiring checks and run jamovi packaging in CI.

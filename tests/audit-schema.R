@@ -7,14 +7,16 @@ m <- yaml.load_file("jamovi/0000.yaml")
 refs <- yaml.load_file("jamovi/00refs.yaml")
 d <- read.dcf("DESCRIPTION")
 stopifnot(
-  identical(as.character(d[1, "Version"]), "1.0.0"),
-  identical(as.character(a$version), "1.0.0"),
-  identical(as.character(m$version), "1.0.0"),
+  identical(as.character(d[1, "Version"]), "1.0.1"),
+  identical(as.character(a$version), "1.0.1"),
+  identical(as.character(m$version), "1.0.1"),
   identical(a$options[[2]]$name, "constructs"),
   identical(a$options[[2]]$type, "Array"),
   identical(a$options[[2]]$template$type, "Group"),
   length(a$options[[2]]$template$elements) == 2L,
   all(c("henseler2015", "ringle2023") %in% names(refs$refs)),
+  is.null(a$refs), # analysis-level refs are unsupported by this compiler
+
   !any(c("notes", "references") %in% vapply(r$items, `[[`, "", "name"))
 )
 optionNames <- vapply(a$options, `[[`, "", "name")
@@ -23,7 +25,24 @@ matrix <- Filter(function(x) identical(x$name, "htmtMatrix"), r$items)[[1]]
 stopifnot(
   length(matrix$columns) == 1L,
   identical(matrix$columns[[1]]$name, "construct"),
+  setequal(unlist(matrix$refs, use.names = FALSE), c("henseler2015", "ringle2023")),
   all(c("constructs", "correlation", "missing") %in% matrix$clearWith)
 )
-stopifnot(grepl("ListBox", paste(readLines("jamovi/discriminantvalidity.u.yaml"), collapse=" ")))
+pairTable <- Filter(function(x) identical(x$name, "pairTable"), r$items)[[1]]
+stopifnot(
+  !("threshold" %in% vapply(pairTable$columns, `[[`, "", "name")),
+  identical(u$compilerMode, "tame"),
+  file.exists("jamovi/js/discriminantvalidity.events.js")
+)
+uiText <- paste(readLines("jamovi/discriminantvalidity.u.yaml"), collapse = " ")
+backendText <- paste(readLines("R/discriminantvalidity.b.R"), collapse = " ")
+coreText <- paste(readLines("R/htmt-core.R"), collapse = " ")
+stopifnot(
+  grepl("ListBox", uiText, fixed = TRUE),
+  grepl("listItemAdded", uiText, fixed = TRUE),
+  grepl("htmt_correlations(self$data", backendText, fixed = TRUE),
+  grepl("pairTab$setNote", backendText, fixed = TRUE),
+  !grepl("stats::cor(", backendText, fixed = TRUE),
+  sum(gregexpr("stats::cor(", coreText, fixed = TRUE)[[1]] > 0) == 1L
+)
 cat("Static jamovi YAML and version checks passed.\n")
