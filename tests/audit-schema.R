@@ -7,9 +7,9 @@ m <- yaml.load_file("jamovi/0000.yaml")
 refs <- yaml.load_file("jamovi/00refs.yaml")
 d <- read.dcf("DESCRIPTION")
 stopifnot(
-  identical(as.character(d[1, "Version"]), "1.0.1"),
-  identical(as.character(a$version), "1.0.1"),
-  identical(as.character(m$version), "1.0.1"),
+  identical(as.character(d[1, "Version"]), "1.0.2"),
+  identical(as.character(a$version), "1.0.2"),
+  identical(as.character(m$version), "1.0.2"),
   identical(a$options[[2]]$name, "constructs"),
   identical(a$options[[2]]$type, "Array"),
   identical(a$options[[2]]$template$type, "Group"),

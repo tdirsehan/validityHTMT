@@ -152,7 +152,7 @@ discriminantValidityClass <- R6::R6Class(
                 "Discriminant validity is supported when HTMT+ < ",
                 sprintf("%.2f", cut),
                 ". The threshold is a diagnostic, not a mechanical proof."
-            ))
+            ), init = FALSE)
 
             methodLabel <- if (method == "pearson") "Pearson" else "Spearman"
             missingLabel <- if (use == "complete.obs")
@@ -162,7 +162,7 @@ discriminantValidityClass <- R6::R6Class(
                 methodLabel, "; missing data: ", missingLabel,
                 "; decision threshold: ", sprintf("%.2f", cut),
                 ". The threshold is a diagnostic, not a mechanical proof."
-            ))
+            ), init = FALSE)
 
             if (any(!is.finite(R))) {
                 notice <- jmvcore::Notice$new(

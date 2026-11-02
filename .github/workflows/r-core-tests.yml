@@ -91,6 +91,9 @@ jobs:
       - name: Validate JavaScript event handler syntax
         run: node --check jamovi/js/discriminantvalidity.events.js
 
+      - name: Test construct naming event behavior
+        run: node tests/test-ui-events.js
+
       - name: Parse all R source code
         shell: Rscript {0}
         run: |
