@@ -60,6 +60,11 @@ jobs:
           if (!identical(as.integer(status), 0L))
               stop("jmvtools::install() failed")
 
+      - name: Test generated jamovi R analysis and result tables
+        run: |
+          R CMD INSTALL .
+          Rscript tests/integration-jamovi.R
+
       - name: Verify actual JMO archive
         run: |
           set -euo pipefail
