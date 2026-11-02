@@ -48,10 +48,17 @@ jobs:
       - name: Build and install JMO
         shell: Rscript {0}
         run: |
-          options(jamovi_home = "/Applications/jamovi.app/Contents")
-          jmvtools::check()
-          jmvtools::prepare()
-          jmvtools::install()
+          # jmvtools expects the .app bundle root, not Contents.
+          options(jamovi_home = "/Applications/jamovi.app")
+          status <- jmvtools::check()
+          if (!identical(as.integer(status), 0L))
+              stop("jmvtools::check() could not locate jamovi")
+          status <- jmvtools::prepare()
+          if (!identical(as.integer(status), 0L))
+              stop("jmvtools::prepare() failed")
+          status <- jmvtools::install()
+          if (!identical(as.integer(status), 0L))
+              stop("jmvtools::install() failed")
 
       - name: Verify actual JMO archive
         run: |
