@@ -39,9 +39,11 @@ jobs:
           Rscript tests/ci-core.R
 
       - name: Start jamovi
+        timeout-minutes: 3
         run: |
-          open -a jamovi
-          sleep 12
+          nohup open -a jamovi > /tmp/validityhtmt-jamovi-open.log 2>&1 < /dev/null &
+          sleep 15
+          pgrep -fl 'jamovi' || true
 
       - name: Build and install JMO
         shell: Rscript {0}
