@@ -25,6 +25,11 @@ items:
     title: Pairwise HTMT+ Assessment
     type: Table
     visible: (showPairs)
+    clearWith:
+      - constructs
+      - correlation
+      - missing
+      - threshold
     columns:
       - name: constructA
         title: Construct A

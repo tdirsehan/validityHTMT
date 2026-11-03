@@ -11,7 +11,7 @@ Developed by Prof. Dr. Taşkın Dirsehan.
 - User-defined construct names.
 - Pearson or Spearman correlations.
 - Pairwise-complete or complete-case missing-data handling.
-- Square HTMT+ matrix.
+- Publication-ready, lower-triangular HTMT+ matrix with a clearly marked diagonal.
 - Optional pairwise interpretation table.
 - Selectable 0.85 or 0.90 decision threshold.
 - Checks for repeated indicators and constructs with fewer than two items.
@@ -117,7 +117,7 @@ The lightweight GitHub Actions check runs `tests/ci-core.R` with `jmvcore`; the 
 testthat::test_dir('tests/testthat')
 ```
 
-## v1.0.2 review status
+## v1.0.3 review status
 
 This is a candidate undergoing jamovi library audit remediation. The native Array/ListBox user interface and full jamovi module execution require validation in a running jamovi application. A successful numerical R test alone is not a complete module acceptance test.
 
@@ -188,3 +188,10 @@ Ringle, C. M., Sarstedt, M., Sinkovics, N., & Sinkovics, R. R. (2023). A perspec
 - Ensure computed matrix and interpretation notes persist when results are restored.
 - Test actual packaged analysis outputs, method and threshold behavior, and dynamic UI event labels in CI.
 - The native jamovi graphical interface still requires a final interactive acceptance check.
+
+### v1.0.3 (Claudia's display-audit refinements)
+- Present each HTMT+ construct pair exactly once in the lower triangle; mark non-applicable diagonal cells with an em dash and leave the upper triangle empty.
+- Present the threshold and its diagnostic caveat only under the pairwise assessment table; keep the matrix footnote focused on method and missing data.
+- Configure the pairwise table to clear only when constructs, correlation, missing-data handling or threshold change, not when its visibility toggles.
+- Extend actual jamovi R-analysis integration tests to check two, three and five constructs, triangular output, missing-data paths, thresholds and unchanged calculations.
+- Package and test a versioned macOS JMO in CI and publish a tagged GitHub release when the updated version is merged into `main`.
