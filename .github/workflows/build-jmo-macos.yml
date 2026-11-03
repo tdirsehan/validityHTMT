@@ -108,8 +108,5 @@ jobs:
           if gh release view v1.0.3 >/dev/null 2>&1; then
             echo 'v1.0.3 release already exists; leaving it unchanged.'
           else
-            gh release create v1.0.3 dist/validityHTMT_1.0.3.jmo \\
-              --target "$GITHUB_SHA" \\
-              --title 'validityHTMT v1.0.3' \\
-              --notes 'Release 1.0.3 addresses all three remaining display-audit findings: lower-triangular HTMT+ matrix, consolidated table notes, and pairwise-table clearWith behavior. The attached .jmo is a macOS build validated with jmvtools and automated integration tests; jamovi Library distribution is managed separately by the jamovi team.'
+            gh release create v1.0.3 dist/validityHTMT_1.0.3.jmo --target "$GITHUB_SHA" --title 'validityHTMT v1.0.3' --notes 'Release 1.0.3 addresses all three remaining display-audit findings: lower-triangular HTMT+ matrix, consolidated table notes, and pairwise-table clearWith behavior. The attached .jmo is a macOS build validated with jmvtools and automated integration tests; jamovi Library distribution is managed separately by the jamovi team.'
           fi
