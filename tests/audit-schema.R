@@ -7,9 +7,9 @@ m <- yaml.load_file("jamovi/0000.yaml")
 refs <- yaml.load_file("jamovi/00refs.yaml")
 d <- read.dcf("DESCRIPTION")
 stopifnot(
-  identical(as.character(d[1, "Version"]), "1.0.2"),
-  identical(as.character(a$version), "1.0.2"),
-  identical(as.character(m$version), "1.0.2"),
+  identical(as.character(d[1, "Version"]), "1.0.3"),
+  identical(as.character(a$version), "1.0.3"),
+  identical(as.character(m$version), "1.0.3"),
   identical(a$options[[2]]$name, "constructs"),
   identical(a$options[[2]]$type, "Array"),
   identical(a$options[[2]]$template$type, "Group"),
@@ -31,6 +31,9 @@ stopifnot(
 pairTable <- Filter(function(x) identical(x$name, "pairTable"), r$items)[[1]]
 stopifnot(
   !("threshold" %in% vapply(pairTable$columns, `[[`, "", "name")),
+  identical(unlist(pairTable$clearWith, use.names = FALSE),
+            c("constructs", "correlation", "missing", "threshold")),
+  !("showPairs" %in% pairTable$clearWith),
   identical(u$compilerMode, "tame"),
   file.exists("jamovi/js/discriminantvalidity.events.js")
 )
@@ -42,6 +45,12 @@ stopifnot(
   grepl("listItemAdded", uiText, fixed = TRUE),
   grepl("htmt_correlations(self$data", backendText, fixed = TRUE),
   grepl("pairTab$setNote", backendText, fixed = TRUE),
+  grepl("for (j in seq.int(i, k))", backendText, fixed = TRUE),
+  grepl("for (j in seq_len(i - 1L))", backendText, fixed = TRUE),
+  grepl("values[[paste0(\"c\", i)]] <- \"\\u2014\"", backendText, fixed = TRUE),
+  !grepl("decision threshold:", backendText, fixed = TRUE),
+  sum(gregexpr("The threshold is a diagnostic", backendText,
+               fixed = TRUE)[[1]] > 0) == 1L,
   !grepl("stats::cor(", backendText, fixed = TRUE),
   sum(gregexpr("stats::cor(", coreText, fixed = TRUE)[[1]] > 0) == 1L
 )

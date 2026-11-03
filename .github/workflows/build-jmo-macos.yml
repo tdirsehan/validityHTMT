@@ -78,6 +78,35 @@ jobs:
       - name: Upload platform-specific JMO
         uses: actions/upload-artifact@v4
         with:
-          name: validityHTMT-1.0.2-macos-jmo
+          name: validityHTMT-1.0.3-macos-jmo
           path: dist/*.jmo
           if-no-files-found: error
+
+  publish-github-release:
+    # Only publish after the complete packaged jamovi test job succeeds on main.
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: jmo-macos
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download tested macOS JMO
+        uses: actions/download-artifact@v4
+        with:
+          name: validityHTMT-1.0.3-macos-jmo
+          path: dist
+
+      - name: Publish GitHub release for 1.0.3
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          grep -qx 'Version: 1.0.3' DESCRIPTION
+          test -f dist/validityHTMT_1.0.3.jmo
+          if gh release view v1.0.3 >/dev/null 2>&1; then
+            echo 'v1.0.3 release already exists; leaving it unchanged.'
+          else
+            gh release create v1.0.3 dist/validityHTMT_1.0.3.jmo --target "$GITHUB_SHA" --title 'validityHTMT v1.0.3' --notes 'Release 1.0.3 addresses all three remaining display-audit findings: lower-triangular HTMT+ matrix, consolidated table notes, and pairwise-table clearWith behavior. The attached .jmo is a macOS build validated with jmvtools and automated integration tests; jamovi Library distribution is managed separately by the jamovi team.'
+          fi

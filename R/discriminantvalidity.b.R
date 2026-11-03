@@ -47,11 +47,15 @@ discriminantValidityClass <- R6::R6Class(
                     type = "number",
                     format = "zto"
                 )
-            for (i in seq_len(k))
-                tab$addRow(
-                    rowKey = i,
-                    values = list(construct = spec$names[i])
-                )
+            # Display a single triangle as in published HTMT tables.
+            # Set non-estimable diagonal cells and empty upper cells in init.
+            for (i in seq_len(k)) {
+                values <- list(construct = spec$names[i])
+                for (j in seq.int(i, k))
+                    values[[paste0("c", j)]] <- ""
+                values[[paste0("c", i)]] <- "\u2014"
+                tab$addRow(rowKey = i, values = values)
+            }
 
             if (k >= 2) {
                 pairs <- self$results$pairTable
@@ -116,10 +120,11 @@ discriminantValidityClass <- R6::R6Class(
             if (all(!is.finite(M[upper.tri(M)])))
                 jmvcore::reject("No HTMT+ construct pairs could be estimated. Check within-construct correlations.")
             tab <- self$results$htmtMatrix
-            for (i in seq_len(k)) {
+            # Lower triangle only; never overwrite the preset diagonal/upper cells.
+            for (i in seq.int(2L, k)) {
                 values <- list()
-                for (j in seq_len(k))
-                    values[[paste0("c", j)]] <- if (i == j) NA_real_ else M[i, j]
+                for (j in seq_len(i - 1L))
+                    values[[paste0("c", j)]] <- M[i, j]
                 tab$setRow(rowKey = i, values = values)
             }
 
@@ -159,9 +164,7 @@ discriminantValidityClass <- R6::R6Class(
                 "complete cases" else "pairwise complete observations"
             tab$setNote("method", paste0(
                 "HTMT+ using absolute indicator correlations; correlation: ",
-                methodLabel, "; missing data: ", missingLabel,
-                "; decision threshold: ", sprintf("%.2f", cut),
-                ". The threshold is a diagnostic, not a mechanical proof."
+                methodLabel, "; missing data: ", missingLabel, "."
             ), init = FALSE)
 
             if (any(!is.finite(R))) {
